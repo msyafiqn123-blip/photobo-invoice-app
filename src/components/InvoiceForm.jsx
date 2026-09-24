@@ -317,18 +317,15 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
         </div>
       </div>
 
-      {/* 2. PILIHAN PAKET PHOTOBOOTH (DD) - BERADA TEPAT DI ATAS NOMOR INVOICE */}
-      <div className="bg-stone-950 border border-stone-800 rounded-2xl p-4 space-y-3 shadow-md">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>Pilihan Paket Photobooth (Kode DD)</span>
-          </div>
-          <span className="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold">
-            Otomatis Memperbarui DD & Total Nota
-          </span>
+      {/* 2. PILIHAN PAKET PHOTOBOOTH & NOMOR INVOICE (KOTAK TERSATUKAN) */}
+      <div className="bg-stone-950 border border-stone-800 rounded-2xl p-4 space-y-4 shadow-md">
+        {/* Header Pilihan Paket */}
+        <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
+          <Sparkles className="w-4 h-4 text-amber-400" />
+          <span>Pilihan Paket Photobooth (Kode DD)</span>
         </div>
 
+        {/* Dropdown Paket Layanan */}
         <div>
           <label className="text-[11px] text-stone-400 font-medium block mb-1.5">
             Pilih Paket Layanan:
@@ -347,7 +344,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
         </div>
 
         {/* Quick Badge Details for the Selected Package */}
-        <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+        <div className="grid grid-cols-3 gap-2 pt-0.5 text-center">
           <div className="bg-stone-900/80 border border-stone-800/80 rounded-xl p-2">
             <span className="text-[10px] text-stone-400 block font-medium">Durasi</span>
             <strong className="text-xs font-bold text-stone-100">{currentPkg.durationHours} Jam Acara</strong>
@@ -363,135 +360,131 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
             </strong>
           </div>
         </div>
-      </div>
 
-      {/* 3. NOMOR INVOICE 100% OTOMATIS */}
-      <div className="bg-gradient-to-br from-amber-500/10 via-stone-950 to-stone-950 border border-amber-500/30 rounded-2xl p-4 space-y-3 shadow-inner">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider">
-            <Hash className="w-4 h-4 text-amber-400" />
-            <span>Nomor Invoice Otomatis</span>
-          </div>
+        {/* Divider & Bagian Nomor Invoice */}
+        <div className="border-t border-stone-800/80 pt-3.5 space-y-3">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider">
+              <Hash className="w-4 h-4 text-amber-400" />
+              <span>Nomor Invoice</span>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
-              <Lock className="w-2.5 h-2.5" />
-              OTOMATIS SISTEM
-            </span>
-            <button
-              type="button"
-              onClick={() => setManualOverride(!manualOverride)}
-              className="text-[10px] text-stone-500 hover:text-stone-300 flex items-center gap-1 underline ml-1"
-              title="Kustomisasi jika diperlukan"
-            >
-              <Edit3 className="w-2.5 h-2.5" />
-              <span>{manualOverride ? 'Kunci Otomatis' : 'Edit'}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Big Prominent Invoice Code Display */}
-        {manualOverride ? (
-          <input
-            type="text"
-            value={invoice.invoiceCode || ''}
-            onChange={(e) => onChange({ ...invoice, invoiceCode: e.target.value })}
-            className="w-full bg-stone-900 border border-amber-500 font-mono font-black text-amber-300 text-lg rounded-xl px-3 py-2 focus:outline-none"
-          />
-        ) : (
-          <div className="bg-stone-950/90 border border-stone-800 rounded-xl px-4 py-2.5 flex items-center justify-between">
-            <span className="font-mono font-black text-amber-300 text-lg sm:text-xl tracking-wider select-all">
-              {invoice.invoiceCode || 'INV 01.08/I/03/26'}
-            </span>
-            <span className="text-[10px] text-stone-500 font-mono">
-              AA.BB/CC/DD/YY
-            </span>
-          </div>
-        )}
-
-        {/* Formula breakdown tags */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] pt-1">
-          <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
-            <span className="text-stone-500 block text-[9px] uppercase font-semibold">AA (Tahap)</span>
-            <strong className="text-amber-200">
-              {invoice.stageCode === '02' ? '02 (Lunas)' : '01 (DP)'}
-            </strong>
-          </div>
-
-          <div className="bg-stone-900/80 border border-amber-500/40 rounded-lg px-2.5 py-1.5 flex flex-col justify-between">
-            <span className="text-stone-400 block text-[9px] uppercase font-semibold">
-              BB (No. Urut)
-            </span>
-            <div className="flex items-center gap-1.5 mt-0.5">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  const current = parseInt(invoice.sequenceNumber || '8', 10);
-                  handleSequenceChange(Math.max(1, current - 1));
-                }}
-                className="w-5 h-5 flex items-center justify-center bg-stone-800 hover:bg-stone-700 text-stone-200 rounded font-bold text-xs"
-                title="Kurangi nomor urut"
+                onClick={() => setManualOverride(!manualOverride)}
+                className="text-[10px] text-stone-400 hover:text-amber-400 flex items-center gap-1 transition"
+                title="Kustomisasi nomor jika diperlukan"
               >
-                -
-              </button>
-              <input
-                type="text"
-                value={invoice.sequenceNumber || '08'}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, '').slice(0, 2);
-                  const updated = { ...invoice, sequenceNumber: val };
-                  recalculateSummary(updated);
-                }}
-                onBlur={(e) => {
-                  handleSequenceChange(e.target.value || '08');
-                }}
-                className="w-10 bg-stone-950 border border-stone-700 text-amber-300 font-mono font-bold text-center text-xs rounded py-0.5 focus:outline-none focus:border-amber-500"
-                placeholder="08"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  const current = parseInt(invoice.sequenceNumber || '8', 10);
-                  handleSequenceChange(current + 1);
-                }}
-                className="w-5 h-5 flex items-center justify-center bg-stone-800 hover:bg-stone-700 text-stone-200 rounded font-bold text-xs"
-                title="Tambah nomor urut"
-              >
-                +
+                <Edit3 className="w-2.5 h-2.5" />
+                <span>{manualOverride ? 'Selesai Edit' : 'Edit Nomor'}</span>
               </button>
             </div>
           </div>
 
-          <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
-            <span className="text-stone-500 block text-[9px] uppercase font-semibold">CC (Bulan)</span>
-            <strong className="text-amber-200">
-              {invoice.invoiceCode?.split('/')[1] || 'IX'}
-            </strong>
-          </div>
-
-          <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
-            <span className="text-stone-500 block text-[9px] uppercase font-semibold">DD (Paket)</span>
-            <strong className="text-amber-200 truncate block" title={currentPkg.name}>
-              {invoice.packageCode || '03'} ({currentPkg.name})
-            </strong>
-          </div>
-        </div>
-
-        {/* Tanggal Terbit Input */}
-        <div className="pt-2 border-t border-stone-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
-          <label className="text-[11px] text-stone-400 font-semibold whitespace-nowrap">
-            Tanggal Terbit Nota:
-          </label>
-          <div className="w-full sm:min-w-[280px] sm:w-auto">
-            <CalendarPicker
-              value={invoice.invoiceDate || ''}
-              onChange={(newDate) => {
-                const updated = { ...invoice, invoiceDate: newDate };
-                recalculateSummary(updated);
-              }}
-              label="Tanggal Terbit Nota"
-              placeholder="Pilih Tanggal Terbit..."
+          {/* Big Prominent Invoice Code Display */}
+          {manualOverride ? (
+            <input
+              type="text"
+              value={invoice.invoiceCode || ''}
+              onChange={(e) => onChange({ ...invoice, invoiceCode: e.target.value })}
+              className="w-full bg-stone-900 border border-amber-500 font-mono font-black text-amber-300 text-lg rounded-xl px-3 py-2 focus:outline-none"
             />
+          ) : (
+            <div className="bg-stone-900/90 border border-stone-800 rounded-xl px-4 py-2.5 flex items-center justify-between">
+              <span className="font-mono font-black text-amber-300 text-lg sm:text-xl tracking-wider select-all">
+                {invoice.invoiceCode || 'INV 01.08/I/03/26'}
+              </span>
+              <span className="text-[10px] text-stone-500 font-mono">
+                AA.BB/CC/DD/YY
+              </span>
+            </div>
+          )}
+
+          {/* Formula breakdown tags */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] pt-1">
+            <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
+              <span className="text-stone-500 block text-[9px] uppercase font-semibold">AA (Tahap)</span>
+              <strong className="text-amber-200">
+                {invoice.stageCode === '02' ? '02 (Lunas)' : '01 (DP)'}
+              </strong>
+            </div>
+
+            <div className="bg-stone-900/80 border border-amber-500/40 rounded-lg px-2.5 py-1.5 flex flex-col justify-between">
+              <span className="text-stone-400 block text-[9px] uppercase font-semibold">
+                BB (No. Urut)
+              </span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = parseInt(invoice.sequenceNumber || '8', 10);
+                    handleSequenceChange(Math.max(1, current - 1));
+                  }}
+                  className="w-5 h-5 flex items-center justify-center bg-stone-800 hover:bg-stone-700 text-stone-200 rounded font-bold text-xs"
+                  title="Kurangi nomor urut"
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  value={invoice.sequenceNumber || '08'}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 2);
+                    const updated = { ...invoice, sequenceNumber: val };
+                    recalculateSummary(updated);
+                  }}
+                  onBlur={(e) => {
+                    handleSequenceChange(e.target.value || '08');
+                  }}
+                  className="w-10 bg-stone-950 border border-stone-700 text-amber-300 font-mono font-bold text-center text-xs rounded py-0.5 focus:outline-none focus:border-amber-500"
+                  placeholder="08"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const current = parseInt(invoice.sequenceNumber || '8', 10);
+                    handleSequenceChange(current + 1);
+                  }}
+                  className="w-5 h-5 flex items-center justify-center bg-stone-800 hover:bg-stone-700 text-stone-200 rounded font-bold text-xs"
+                  title="Tambah nomor urut"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
+              <span className="text-stone-500 block text-[9px] uppercase font-semibold">CC (Bulan)</span>
+              <strong className="text-amber-200">
+                {invoice.invoiceCode?.split('/')[1] || 'IX'}
+              </strong>
+            </div>
+
+            <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
+              <span className="text-stone-500 block text-[9px] uppercase font-semibold">DD (Paket)</span>
+              <strong className="text-amber-200 truncate block" title={currentPkg.name}>
+                {invoice.packageCode || '03'} ({currentPkg.name})
+              </strong>
+            </div>
+          </div>
+
+          {/* Tanggal Terbit Input */}
+          <div className="pt-2 border-t border-stone-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
+            <label className="text-[11px] text-stone-400 font-semibold whitespace-nowrap">
+              Tanggal Terbit Nota:
+            </label>
+            <div className="w-full sm:min-w-[280px] sm:w-auto">
+              <CalendarPicker
+                value={invoice.invoiceDate || ''}
+                onChange={(newDate) => {
+                  const updated = { ...invoice, invoiceDate: newDate };
+                  recalculateSummary(updated);
+                }}
+                label="Tanggal Terbit Nota"
+                placeholder="Pilih Tanggal Terbit..."
+              />
+            </div>
           </div>
         </div>
       </div>
