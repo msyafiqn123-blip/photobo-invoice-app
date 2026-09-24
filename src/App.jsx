@@ -4,6 +4,8 @@ import InvoiceForm from './components/InvoiceForm';
 import InvoiceList from './components/InvoiceList';
 import WhatsAppModal from './components/WhatsAppModal';
 import SettingsModal from './components/SettingsModal';
+import InvoiceVerificationView from './components/InvoiceVerificationView';
+import { parseVerificationData } from './utils/qrcode';
 import {
   loadInvoices,
   saveInvoice,
@@ -123,6 +125,17 @@ function App() {
   // Modals
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Check if current URL is a verification link (?verify=1 or ?v=...)
+  const [verificationData, setVerificationData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('verify') || sp.get('v')) {
+        return parseVerificationData(sp);
+      }
+    }
+    return null;
+  });
 
   const previewRef = useRef(null);
   
@@ -256,6 +269,22 @@ function App() {
     }
     showToast('Pengaturan studio berhasil diperbarui!');
   };
+
+  if (verificationData) {
+    return (
+      <InvoiceVerificationView
+        data={verificationData}
+        onBackToApp={() => {
+          if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href);
+            url.search = '';
+            window.history.replaceState({}, document.title, url.pathname);
+          }
+          setVerificationData(null);
+        }}
+      />
+    );
+  }
 
   const isMobile = windowWidth < 1024;
 

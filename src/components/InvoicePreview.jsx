@@ -1,8 +1,11 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import { formatRupiah, formatDateIndo } from '../utils/formatters';
+import { getVerificationUrl, generateQrDataUrl } from '../utils/qrcode';
 
 const InvoicePreview = forwardRef(({ invoice, settings, scale = 1, id = 'invoice-document' }, ref) => {
   if (!invoice) return null;
+
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
   const {
     invoiceCode = 'INV 01.08/I/03/26',
@@ -16,6 +19,27 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1, id = 'invoice
     accountHolder,
     hasStamp = true,
   } = invoice;
+
+  useEffect(() => {
+    let active = true;
+    const url = getVerificationUrl(invoice);
+    generateQrDataUrl(url).then((dataUri) => {
+      if (active && dataUri) {
+        setQrCodeDataUrl(dataUri);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [
+    invoice.id,
+    invoice.invoiceCode,
+    invoice.docType,
+    invoice.client?.name,
+    invoice.summary?.remainingBalance,
+    invoice.summary?.grandTotal,
+    invoice.summary?.totalPaidSoFar,
+  ]);
 
   const studioSettings = settings || {};
   const instagramHandle = studioSettings.instagram || '@Photobo_Studio';
@@ -310,9 +334,39 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1, id = 'invoice
         </div>
 
         {/* LOWER SECTION */}
-        <div className="relative pt-2">
+        <div className="relative pt-1">
+          {/* QR Code Verifikasi Pembayaran Resmi */}
+          <div className="flex items-center gap-3.5 -mt-7 mb-4 pl-1">
+            <div className="p-1 bg-white border border-black/35 rounded-lg shadow-sm shrink-0">
+              {qrCodeDataUrl ? (
+                <img
+                  src={qrCodeDataUrl}
+                  alt="QR Verifikasi Pembayaran"
+                  className="w-[66px] h-[66px] object-contain block"
+                />
+              ) : (
+                <div className="w-[66px] h-[66px] bg-stone-100 flex items-center justify-center text-[9px] font-mono text-black/40">
+                  QR CODE
+                </div>
+              )}
+            </div>
+            <div className="space-y-0.5">
+              <div className="font-black text-[12px] tracking-wider uppercase text-black">
+                PINDAI UNTUK VERIFIKASI RESMI
+              </div>
+              <div className="text-[11px] font-bold text-black/85">
+                {isLunas
+                  ? 'Status: LUNAS 100% (Terverifikasi)'
+                  : `Cek Status Tagihan & Sisa: ${formatRupiah(summary.remainingBalance ?? 0)}`}
+              </div>
+              <div className="text-[9.5px] font-mono font-medium text-black/60">
+                photobo-invoice-app.vercel.app
+              </div>
+            </div>
+          </div>
+
           {/* Metode Pembayaran & Nomor Rekening (Dinaikkan agar tidak bertabrakan dengan stempel) */}
-          <div className="flex justify-between items-start -mt-9 mb-7">
+          <div className="flex justify-between items-start mb-6">
             <div>
               <div className="font-black tracking-wider text-black uppercase text-[13.5px]">
                 METODE PEMBAYARAN :
