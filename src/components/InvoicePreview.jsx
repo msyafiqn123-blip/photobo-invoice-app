@@ -278,9 +278,8 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
               {/* Status Lunas dibawah Sisa Pembayaran */}
               {isLunas && (
                 <div className="flex justify-end pr-4 pt-1">
-                  <span className="inline-flex items-center gap-1.5 text-[11.5px] font-black tracking-widest px-3 py-1 rounded-full bg-[#065F46] text-white uppercase shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    LUNAS / PAID
+                  <span className="inline-flex items-center justify-center text-[14px] font-black tracking-[0.12em] px-4 py-1 rounded-full bg-[#065F46] text-white uppercase shadow-sm">
+                    LUNAS
                   </span>
                 </div>
               )}
