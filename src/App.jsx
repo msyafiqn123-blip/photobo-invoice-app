@@ -310,9 +310,6 @@ function App() {
                 <span className="hidden sm:inline font-extrabold text-sm sm:text-base text-stone-400">
                   STUDIO
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                  AUTO-INV
-                </span>
               </div>
             </div>
           </div>

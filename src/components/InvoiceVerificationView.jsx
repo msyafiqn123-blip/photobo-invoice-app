@@ -58,7 +58,7 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
           </h1>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Sistem Verifikasi Pembayaran Resmi</span>
+            <span>Verifikasi Pembayaran Resmi</span>
           </div>
         </div>
 
@@ -101,7 +101,7 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
             </div>
             <p className="text-xs sm:text-sm text-stone-300 mt-2 max-w-md mx-auto leading-relaxed">
               {isLunas
-                ? 'Seluruh tagihan untuk jadwal acara ini telah lunas dan terverifikasi secara sah di sistem Photobo Studio.'
+                ? 'Seluruh tagihan untuk jadwal acara ini telah lunas dan terverifikasi secara sah di Photobo Studio.'
                 : isDpOnly
                 ? 'Pembayaran uang muka (DP) telah diterima. Sisa pembayaran wajib diselesaikan maksimal H-1 tanggal acara.'
                 : 'Menjelang hari pelaksanaan, mohon lakukan pelunasan ke rekening resmi Photobo Studio.'}

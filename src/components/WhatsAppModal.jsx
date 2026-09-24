@@ -112,7 +112,7 @@ const WhatsAppModal = ({ isOpen, onClose, invoice, settings }) => {
             </div>
             <div>
               <span className="block text-sm text-stone-100 font-bold">Kirim Invoice via WhatsApp</span>
-              <span className="block text-[11px] text-emerald-400 font-normal">Lampiran Dokumen PDF A5 Otomatis</span>
+              <span className="block text-[11px] text-emerald-400 font-normal">Lampiran Dokumen PDF A5</span>
             </div>
           </div>
           <button

@@ -61,7 +61,7 @@ const InvoiceList = ({
             <span>Riwayat & Daftar Invoice</span>
           </h2>
           <p className="text-xs text-stone-400">
-            Total {invoices.length} invoice tersimpan di sistem
+            Total {invoices.length} invoice tersimpan
           </p>
         </div>
 
