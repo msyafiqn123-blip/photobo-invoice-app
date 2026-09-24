@@ -479,7 +479,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf }
           <label className="text-[11px] text-stone-400 font-semibold whitespace-nowrap">
             Tanggal Terbit Nota:
           </label>
-          <div className="w-full sm:w-60">
+          <div className="w-full sm:min-w-[280px] sm:w-auto">
             <CalendarPicker
               value={invoice.invoiceDate || ''}
               onChange={(newDate) => {

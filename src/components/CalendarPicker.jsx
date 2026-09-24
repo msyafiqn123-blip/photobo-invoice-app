@@ -192,16 +192,16 @@ const CalendarPicker = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full bg-stone-950 border border-stone-800 hover:border-amber-500/60 rounded-xl px-3.5 py-2.5 text-left text-xs sm:text-sm text-stone-200 flex items-center justify-between gap-2 transition group shadow-sm focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+        className="w-full bg-stone-950 border border-stone-800 hover:border-amber-500/60 rounded-xl px-3 py-2 text-left text-xs sm:text-sm text-stone-200 flex items-center justify-between gap-2 transition group shadow-sm focus:outline-none focus:ring-1 focus:ring-amber-500/50"
       >
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-105 transition shrink-0">
-            <CalendarIcon className="w-4 h-4" />
+            <CalendarIcon className="w-3.5 h-3.5" />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             {value ? (
-              <div className="flex items-center gap-2 truncate">
-                <span className="font-semibold text-stone-100 truncate">
+              <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
+                <span className="font-bold text-stone-100 text-xs sm:text-sm whitespace-nowrap">
                   {formatDateIndo(value)}
                 </span>
                 {dayOfWeek && (
@@ -211,14 +211,14 @@ const CalendarPicker = ({
                 )}
               </div>
             ) : (
-              <span className="text-stone-500 italic text-xs">{placeholder}</span>
+              <span className="text-stone-500 italic text-xs whitespace-nowrap">{placeholder}</span>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-[10px] text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2 py-0.5 rounded font-bold">
-            PILIH TANGGAL
+        <div className="flex items-center gap-1.5 shrink-0 pl-1">
+          <span className="text-[10px] text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2 py-0.5 rounded font-bold group-hover:bg-amber-900/60 transition">
+            PILIH
           </span>
         </div>
       </button>
