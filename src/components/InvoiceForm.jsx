@@ -29,8 +29,11 @@ const DOC_TYPES = [
   { id: 'BUKTI_LUNAS', label: 'Bukti Lunas', badge: 'Lunas 100%' },
 ];
 
-const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf }) => {
+const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, settings }) => {
   const [manualOverride, setManualOverride] = useState(false);
+
+  const availablePackages =
+    settings?.packages && settings.packages.length > 0 ? settings.packages : PACKAGE_OPTIONS;
 
   // Helper to re-derive the automatic invoice code
   const getAutoCode = (inv) => {
@@ -62,7 +65,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf }
 
   // Sync package changes with item-1 and auto-generate invoice code
   const handlePackageChange = (packageCode) => {
-    const pkg = PACKAGE_OPTIONS.find((p) => p.code === packageCode);
+    const pkg = availablePackages.find((p) => p.code === packageCode);
     if (!pkg) return;
 
     const eventDate = invoice.event?.date ? formatDateIndo(invoice.event.date) : 'Tanggal Acara';
@@ -233,7 +236,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf }
     const eventDate = newEvent.date ? formatDateIndo(newEvent.date) : 'Tanggal Acara';
     const timeRange = `${newEvent.timeStart || '10.00'} - ${newEvent.timeEnd || '14.00'}`;
 
-    const pkg = PACKAGE_OPTIONS.find((p) => p.code === invoice.packageCode) || PACKAGE_OPTIONS[2];
+    const pkg = availablePackages.find((p) => p.code === invoice.packageCode) || availablePackages[0] || PACKAGE_OPTIONS[2];
     const formattedDesc = `${newEvent.packageName || pkg.name}\n${newEvent.printType || pkg.printType}\n${eventDate}\n${timeRange}`;
 
     const items = [...(invoice.items || [])];
@@ -283,7 +286,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf }
     recalculateSummary({ ...invoice, items });
   };
 
-  const currentPkg = PACKAGE_OPTIONS.find((p) => p.code === invoice.packageCode) || PACKAGE_OPTIONS[2];
+  const currentPkg = availablePackages.find((p) => p.code === invoice.packageCode) || availablePackages[0] || PACKAGE_OPTIONS[2];
 
   return (
     <div className="bg-stone-900 border border-stone-800 rounded-2xl p-4 sm:p-5 space-y-5 text-stone-200">
@@ -335,7 +338,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf }
             onChange={(e) => handlePackageChange(e.target.value)}
             className="w-full bg-stone-900 border border-stone-700 hover:border-amber-500/50 text-stone-100 font-bold text-xs sm:text-sm rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-amber-500 transition shadow-inner cursor-pointer"
           >
-            {PACKAGE_OPTIONS.map((pkg) => (
+            {availablePackages.map((pkg) => (
               <option key={pkg.code} value={pkg.code} className="bg-stone-900 py-1">
                 [{pkg.code}] {pkg.name} — Rp {pkg.defaultPrice.toLocaleString('id-ID')} ({pkg.printType})
               </option>
@@ -650,7 +653,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf }
                           onChange={(e) => handlePackageChange(e.target.value)}
                           className="w-full bg-stone-900 border border-stone-800 rounded-xl px-3 py-2 text-xs font-semibold text-amber-300 focus:outline-none focus:border-amber-500"
                         >
-                          {PACKAGE_OPTIONS.map((pkg) => (
+                          {availablePackages.map((pkg) => (
                             <option key={pkg.code} value={pkg.code}>
                               [{pkg.code}] {pkg.name} — Rp {pkg.defaultPrice.toLocaleString('id-ID')}
                             </option>

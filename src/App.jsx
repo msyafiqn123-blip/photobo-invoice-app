@@ -32,13 +32,25 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-const createEmptyInvoice = (seq = '08') => {
+const createEmptyInvoice = (seq = '08', currentPackages = PACKAGE_OPTIONS) => {
   const today = new Date().toISOString().split('T')[0];
+  const defaultPkg =
+    (currentPackages && currentPackages.find((p) => p.code === '03')) ||
+    (currentPackages && currentPackages[0]) || {
+      code: '03',
+      name: '4 Jam 2R',
+      durationHours: 4,
+      printType: 'Unlimited 2R',
+      defaultPrice: 2500000,
+    };
+  const pkgPrice = Number(defaultPkg.defaultPrice) || 2500000;
+  const dpAmount = Math.round(pkgPrice * 0.2);
+
   const initialCode = generateInvoiceCode({
     stageCode: '02',
     sequenceNumber: seq,
     invoiceDate: today,
-    packageCode: '03',
+    packageCode: defaultPkg.code || '03',
   });
 
   return {
@@ -48,7 +60,7 @@ const createEmptyInvoice = (seq = '08') => {
     docType: 'TAGIHAN_PELUNASAN',
     stageCode: '02',
     sequenceNumber: seq,
-    packageCode: '03',
+    packageCode: defaultPkg.code || '03',
     client: {
       name: '',
       phone: '',
@@ -58,27 +70,29 @@ const createEmptyInvoice = (seq = '08') => {
       date: today,
       timeStart: '10.00',
       timeEnd: '14.00',
-      durationHours: 4,
-      printType: 'Unlimited 2R',
-      packageName: 'Photobooth 4 Hours',
+      durationHours: defaultPkg.durationHours || 4,
+      printType: defaultPkg.printType || 'Unlimited 2R',
+      packageName: defaultPkg.name?.startsWith('Photobooth')
+        ? defaultPkg.name
+        : `Photobooth ${defaultPkg.durationHours || 4} Hours`,
     },
     items: [
       {
         id: 'item-1',
-        description: `Photobooth 4 Hours\nUnlimited 2R\n${today}\n10.00 - 14.00`,
-        price: 2500000,
+        description: `Photobooth ${defaultPkg.durationHours || 4} Hours\n${defaultPkg.printType || 'Unlimited 2R'}\n${today}\n10.00 - 14.00`,
+        price: pkgPrice,
         paymentType: 'DOWN PAYMENT',
-        amountPaid: 500000,
+        amountPaid: dpAmount,
       },
     ],
     summary: {
-      totalPackagePrice: 2500000,
+      totalPackagePrice: pkgPrice,
       totalAdditionals: 0,
       totalDiscounts: 0,
-      grandTotal: 2500000,
-      downPaymentPaid: 500000,
-      totalPaidSoFar: 500000,
-      remainingBalance: 2000000,
+      grandTotal: pkgPrice,
+      downPaymentPaid: dpAmount,
+      totalPaidSoFar: dpAmount,
+      remainingBalance: Math.max(0, pkgPrice - dpAmount),
     },
     paymentMethod: 'BCA TRANSFER',
     accountNumber: 'BCA 7045166686',
@@ -186,7 +200,7 @@ function App() {
       }
     });
     const nextSeq = String(maxSeq).padStart(2, '0');
-    const newInv = createEmptyInvoice(nextSeq);
+    const newInv = createEmptyInvoice(nextSeq, settings?.packages);
     setActiveInvoice(newInv);
     setDesktopTab('EDITOR');
     setMobileTab('FORM');
@@ -422,6 +436,7 @@ function App() {
                     onSave={handleSaveInvoice}
                     onReset={handleNewInvoice}
                     isSaving={isSaving}
+                    settings={settings}
                   />
                 )}
               </div>
@@ -501,6 +516,7 @@ function App() {
                     onReset={handleNewInvoice}
                     isSaving={isSaving}
                     onViewPdf={() => setMobileTab('PREVIEW')}
+                    settings={settings}
                   />
                 )}
               </div>

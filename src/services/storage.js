@@ -1,4 +1,5 @@
 import { getSupabase } from './supabase';
+import { PACKAGE_OPTIONS } from '../utils/invoiceCode';
 
 export const DEFAULT_STUDIO_SETTINGS = {
   studioName: 'Photobo Studio',
@@ -14,6 +15,7 @@ export const DEFAULT_STUDIO_SETTINGS = {
     'Pelunasan Maksimal H-1 Tanggal Pelaksanaan',
   ],
   validityNote: 'Invoice ini adalah bukti pembayaran yang sah',
+  packages: PACKAGE_OPTIONS,
 };
 
 export const INITIAL_SAMPLE_INVOICES = [
@@ -269,7 +271,12 @@ export const loadSettings = () => {
     return DEFAULT_STUDIO_SETTINGS;
   }
   try {
-    return { ...DEFAULT_STUDIO_SETTINGS, ...JSON.parse(local) };
+    const parsed = JSON.parse(local);
+    return {
+      ...DEFAULT_STUDIO_SETTINGS,
+      ...parsed,
+      packages: Array.isArray(parsed?.packages) && parsed.packages.length > 0 ? parsed.packages : DEFAULT_STUDIO_SETTINGS.packages,
+    };
   } catch (e) {
     return DEFAULT_STUDIO_SETTINGS;
   }
