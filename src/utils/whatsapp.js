@@ -18,7 +18,7 @@ export const generateWhatsAppMessage = ({ invoice, settings }) => {
     case 'TAGIHAN_DP':
       return `Halo Kak *${clientName}*, salam hangat dari *Photobo Studio*! 👋📸
 
-Berikut adalah rincian tagihan *Down Payment (DP)* untuk penguncian jadwal Photobooth acara Kakak:
+Berikut adalah rincian *Tagihan Booking Fee* untuk penguncian jadwal Photobooth acara Kakak:
 📄 *No. Invoice:* ${invoiceCode}
 📅 *Tanggal Acara:* ${eventDate}
 📦 *Paket:* ${packageName}

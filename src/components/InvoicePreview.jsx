@@ -37,9 +37,9 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
     switch (docType) {
       case 'TAGIHAN_DP':
         return {
-          title: 'NOTA PEMBAYARAN',
+          title: 'TAGIHAN BOOKING FEE',
           recipientLabel: 'DITAGIHKAN KEPADA',
-          note: 'Mohon lakukan pembayaran DP untuk konfirmasi jadwal.',
+          note: 'Mohon lakukan pembayaran Booking Fee untuk konfirmasi jadwal.',
           showStamp: false,
         };
       case 'TAGIHAN_PELUNASAN':

@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 const DOC_TYPES = [
-  { id: 'TAGIHAN_DP', label: 'Tagihan DP', badge: 'Draft Tagihan' },
+  { id: 'TAGIHAN_DP', label: 'Tagihan Booking Fee', badge: 'Draft Tagihan' },
   { id: 'BUKTI_DP', label: 'Bukti Bayar DP', badge: 'Stempel Aktif' },
   { id: 'TAGIHAN_PELUNASAN', label: 'Tagihan Pelunasan', badge: 'Menjelang Hari H' },
   { id: 'BUKTI_LUNAS', label: 'Bukti Lunas', badge: 'Lunas 100%' },

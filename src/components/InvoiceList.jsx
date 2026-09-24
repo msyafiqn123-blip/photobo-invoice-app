@@ -39,7 +39,7 @@ const InvoiceList = ({
   const getDocBadge = (type) => {
     switch (type) {
       case 'TAGIHAN_DP':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800">TAGIHAN DP</span>;
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800">BOOKING FEE</span>;
       case 'BUKTI_DP':
         return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950 text-blue-300 border border-blue-800">DP DITERIMA</span>;
       case 'TAGIHAN_PELUNASAN':
@@ -94,7 +94,7 @@ const InvoiceList = ({
             className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs text-stone-200 focus:outline-none focus:border-amber-500 font-semibold"
           >
             <option value="ALL">Semua Status Dokumen</option>
-            <option value="TAGIHAN_DP">Tagihan DP</option>
+            <option value="TAGIHAN_DP">Tagihan Booking Fee</option>
             <option value="BUKTI_DP">Bukti DP Diterima</option>
             <option value="TAGIHAN_PELUNASAN">Tagihan Pelunasan</option>
             <option value="BUKTI_LUNAS">Bukti Lunas</option>
