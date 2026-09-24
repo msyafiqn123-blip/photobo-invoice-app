@@ -289,8 +289,8 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
 
         {/* LOWER SECTION */}
         <div className="relative pt-2">
-          {/* Metode Pembayaran & Nomor Rekening */}
-          <div className="flex justify-between items-start pt-1">
+          {/* Metode Pembayaran & Nomor Rekening (Dinaikkan agar tidak bertabrakan dengan stempel) */}
+          <div className="flex justify-between items-start -mt-9 mb-7">
             <div>
               <div className="font-black tracking-wider text-black uppercase text-[13.5px]">
                 METODE PEMBAYARAN :
@@ -330,7 +330,7 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
           {/* Official Stamp - Natural angle with centered Photobo text */}
           {docConfig.showStamp && (
             <div
-              className="absolute right-[30px] bottom-[34px] pointer-events-none"
+              className="absolute right-[24px] bottom-[20px] pointer-events-none"
               style={{
                 filter: 'drop-shadow(0 3px 6px rgba(217, 27, 36, 0.2))',
               }}
@@ -338,7 +338,7 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
               <img
                 src="/photobo_stamp.svg"
                 alt="Photobo Stamp"
-                className="w-[140px] h-auto object-contain opacity-95"
+                className="w-[130px] h-auto object-contain opacity-95"
               />
             </div>
           )}

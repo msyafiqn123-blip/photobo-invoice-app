@@ -12,6 +12,7 @@ export const getInvoicePdfBlob = async (elementId, paperSize = 'a5') => {
   }
 
   // Create an unconstrained fixed wrapper outside the React DOM hierarchy
+  // Create an unconstrained fixed wrapper outside the React DOM hierarchy
   // to completely eliminate any clipping from parent containers with overflow: hidden or transform scale
   const wrapper = document.createElement('div');
   wrapper.style.position = 'fixed';
@@ -19,9 +20,9 @@ export const getInvoicePdfBlob = async (elementId, paperSize = 'a5') => {
   wrapper.style.left = '0';
   wrapper.style.width = '794px';
   wrapper.style.height = '1123px';
-  wrapper.style.zIndex = '-99999';
+  wrapper.style.zIndex = '99999';
   wrapper.style.pointerEvents = 'none';
-  wrapper.style.overflow = 'visible';
+  wrapper.style.overflow = 'hidden';
   wrapper.style.opacity = '1';
   wrapper.style.margin = '0';
   wrapper.style.padding = '0';
@@ -44,8 +45,27 @@ export const getInvoicePdfBlob = async (elementId, paperSize = 'a5') => {
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
 
-  // Wait for clone images & fonts to settle
-  await new Promise((resolve) => setTimeout(resolve, 200));
+  // Wait for fonts to be ready
+  if (document.fonts && document.fonts.ready) {
+    try {
+      await document.fonts.ready;
+    } catch (_) {}
+  }
+
+  // Wait for images in the cloned subtree to finish loading
+  const imgs = Array.from(clone.querySelectorAll('img'));
+  await Promise.all(
+    imgs.map((img) => {
+      if (img.complete) return Promise.resolve();
+      return new Promise((res) => {
+        img.onload = res;
+        img.onerror = res;
+      });
+    })
+  );
+
+  // Short delay for layout & rendering to stabilize
+  await new Promise((resolve) => setTimeout(resolve, 150));
 
   try {
     const canvas = await html2canvas(clone, {
@@ -63,10 +83,6 @@ export const getInvoicePdfBlob = async (elementId, paperSize = 'a5') => {
       scrollX: 0,
       scrollY: 0,
     });
-
-    if (document.body.contains(wrapper)) {
-      document.body.removeChild(wrapper);
-    }
 
     const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
@@ -86,11 +102,12 @@ export const getInvoicePdfBlob = async (elementId, paperSize = 'a5') => {
     const blob = pdf.output('blob');
     return { blob, pdf };
   } catch (error) {
+    console.error('Error generating PDF blob:', error);
+    throw error;
+  } finally {
     if (document.body.contains(wrapper)) {
       document.body.removeChild(wrapper);
     }
-    console.error('Error generating PDF blob:', error);
-    throw error;
   }
 };
 

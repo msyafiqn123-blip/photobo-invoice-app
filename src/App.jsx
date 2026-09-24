@@ -212,6 +212,13 @@ function App() {
       setActiveInvoice(invToDownload);
     }
 
+    // Pastikan tab Preview / Editor aktif agar elemen DOM invoice-document ter-mount sempurna
+    if (isMobile && mobileTab !== 'PREVIEW') {
+      setMobileTab('PREVIEW');
+    } else if (!isMobile && desktopTab === 'LIST') {
+      setDesktopTab('EDITOR');
+    }
+
     showToast('Menyiapkan file PDF ukuran A5 (148 × 210 mm)...');
     setTimeout(async () => {
       try {
@@ -222,7 +229,7 @@ function App() {
         console.error(err);
         showToast('Gagal mengunduh PDF.');
       }
-    }, 300);
+    }, 350);
   };
 
   const handlePrint = () => {
