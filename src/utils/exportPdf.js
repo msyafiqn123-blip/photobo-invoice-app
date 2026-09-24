@@ -4,14 +4,17 @@ import jsPDF from 'jspdf';
 /**
  * Render invoice DOM element to high-res jsPDF instance & Blob
  */
-export const getInvoicePdfBlob = async (elementId, paperSize = 'a5') => {
-  const element = document.getElementById(elementId);
+export const getInvoicePdfBlob = async (elementId = 'invoice-document', paperSize = 'a5') => {
+  const element =
+    (elementId && document.getElementById(elementId)) ||
+    document.getElementById('invoice-document-master') ||
+    document.getElementById('invoice-document');
+
   if (!element) {
-    console.error(`Element with id ${elementId} not found`);
+    console.error(`Invoice element not found (attempted: ${elementId}, invoice-document-master, invoice-document)`);
     return null;
   }
 
-  // Create an unconstrained fixed wrapper outside the React DOM hierarchy
   // Create an unconstrained fixed wrapper outside the React DOM hierarchy
   // to completely eliminate any clipping from parent containers with overflow: hidden or transform scale
   const wrapper = document.createElement('div');
@@ -30,6 +33,12 @@ export const getInvoicePdfBlob = async (elementId, paperSize = 'a5') => {
 
   const clone = element.cloneNode(true);
   clone.id = 'invoice-document-capture-clone';
+  clone.style.position = 'relative';
+  clone.style.top = '0';
+  clone.style.left = '0';
+  clone.style.display = 'block';
+  clone.style.visibility = 'visible';
+  clone.style.opacity = '1';
   clone.style.transform = 'none';
   clone.style.margin = '0';
   clone.style.boxShadow = 'none';
@@ -82,6 +91,15 @@ export const getInvoicePdfBlob = async (elementId, paperSize = 'a5') => {
       y: 0,
       scrollX: 0,
       scrollY: 0,
+      onclone: (clonedDoc) => {
+        const clonedEl = clonedDoc.getElementById('invoice-document-capture-clone');
+        if (clonedEl) {
+          clonedEl.style.transform = 'none';
+          clonedEl.style.display = 'block';
+          clonedEl.style.visibility = 'visible';
+          clonedEl.style.opacity = '1';
+        }
+      },
     });
 
     const imgData = canvas.toDataURL('image/jpeg', 0.98);

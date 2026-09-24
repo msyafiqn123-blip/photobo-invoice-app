@@ -45,7 +45,7 @@ const WhatsAppModal = ({ isOpen, onClose, invoice, settings }) => {
   const handleDirectDownload = async () => {
     setIsGenerating(true);
     try {
-      const res = await getInvoicePdfBlob('invoice-document', 'a5');
+      const res = await getInvoicePdfBlob('invoice-document-master', 'a5');
       if (res && res.pdf) {
         res.pdf.save(filename);
         setDownloadTriggered(true);
@@ -60,7 +60,7 @@ const WhatsAppModal = ({ isOpen, onClose, invoice, settings }) => {
   const handleSendToWhatsApp = async () => {
     setIsGenerating(true);
     try {
-      const res = await getInvoicePdfBlob('invoice-document', 'a5');
+      const res = await getInvoicePdfBlob('invoice-document-master', 'a5');
 
       if (res && res.blob) {
         const file = new File([res.blob], filename, { type: 'application/pdf' });

@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { formatRupiah, formatDateIndo } from '../utils/formatters';
 
-const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
+const InvoicePreview = forwardRef(({ invoice, settings, scale = 1, id = 'invoice-document' }, ref) => {
   if (!invoice) return null;
 
   const {
@@ -77,9 +77,10 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
   return (
     <div
       ref={ref}
-      id="invoice-document"
+      id={id}
       className="invoice-print-container relative bg-[#C1B6A4] text-black font-mulish select-none shadow-2xl"
       style={{
+        position: 'relative',
         width: '794px',
         minWidth: '794px',
         maxWidth: '794px',
@@ -95,9 +96,20 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
       {/* 1. Background Vector Architecture Matching Authentic Canva Template */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        width="794"
+        height="1123"
         viewBox="0 0 794 1123"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '794px',
+          height: '1123px',
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
       >
         {/* Full Taupe Border Base #C1B6A4 */}
         <rect width="794" height="1123" fill="#C1B6A4" />
@@ -128,7 +140,15 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
       </svg>
 
       {/* 2. Top Right PHOTOBO Camera Logo (Bold & Beautifully Proportioned) */}
-      <div className="absolute top-[-6px] right-[48px] z-10">
+      <div
+        className="absolute top-[-6px] right-[48px] z-20"
+        style={{
+          position: 'absolute',
+          top: '-6px',
+          right: '48px',
+          zIndex: 20,
+        }}
+      >
         <img
           src="/photobo_logo_white.png"
           alt="Photobo Logo"
@@ -140,6 +160,8 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
       <div
         className="relative z-10 flex flex-col justify-between"
         style={{
+          position: 'relative',
+          zIndex: 10,
           width: '794px',
           height: '1123px',
           padding: '96px 54px 64px 54px',

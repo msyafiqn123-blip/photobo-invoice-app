@@ -226,24 +226,17 @@ function App() {
       setActiveInvoice(invToDownload);
     }
 
-    // Pastikan tab Preview / Editor aktif agar elemen DOM invoice-document ter-mount sempurna
-    if (isMobile && mobileTab !== 'PREVIEW') {
-      setMobileTab('PREVIEW');
-    } else if (!isMobile && desktopTab === 'LIST') {
-      setDesktopTab('EDITOR');
-    }
-
     showToast('Menyiapkan file PDF ukuran A5 (148 × 210 mm)...');
-    setTimeout(async () => {
-      try {
-        const filename = `${target.invoiceCode || 'INVOICE'} - ${target.client?.name || 'Photobo'}.pdf`.replace(/[\/\\:]/g, '_');
-        await downloadInvoicePdf('invoice-document', filename, 'a5');
-        showToast('PDF A5 berhasil diunduh!');
-      } catch (err) {
-        console.error(err);
-        showToast('Gagal mengunduh PDF.');
-      }
-    }, 350);
+    try {
+      // Small delay to ensure activeInvoice state updates if target was changed
+      await new Promise((r) => setTimeout(r, 60));
+      const filename = `${target.invoiceCode || 'INVOICE'} - ${target.client?.name || 'Photobo'}.pdf`.replace(/[\/\\:]/g, '_');
+      await downloadInvoicePdf('invoice-document-master', filename, 'a5');
+      showToast('PDF A5 berhasil diunduh!');
+    } catch (err) {
+      console.error(err);
+      showToast('Gagal mengunduh PDF.');
+    }
   };
 
   const handlePrint = () => {
@@ -644,6 +637,33 @@ function App() {
         settings={settings}
         onSaveSettings={handleSaveSettings}
       />
+
+      {/* Dedicated Master Invoice Document for 100% Reliable PDF & Print Generation */}
+      {/* Always mounted in DOM regardless of active tab (Desktop, Mobile, List, Form, Modal) */}
+      <div
+        id="invoice-capture-master-container"
+        style={{
+          position: 'fixed',
+          top: '-99999px',
+          left: '-99999px',
+          width: '794px',
+          height: '1123px',
+          pointerEvents: 'none',
+          opacity: 0,
+          zIndex: -9999,
+          overflow: 'hidden',
+        }}
+        aria-hidden="true"
+      >
+        {activeInvoice && (
+          <InvoicePreview
+            id="invoice-document-master"
+            invoice={activeInvoice}
+            settings={settings}
+            scale={1}
+          />
+        )}
+      </div>
 
       {/* Toast Notification */}
       {notification && (
