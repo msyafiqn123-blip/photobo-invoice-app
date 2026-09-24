@@ -5,6 +5,7 @@ import InvoiceList from './components/InvoiceList';
 import WhatsAppModal from './components/WhatsAppModal';
 import SettingsModal from './components/SettingsModal';
 import InvoiceVerificationView from './components/InvoiceVerificationView';
+import AuthGateView from './components/AuthGateView';
 import { parseVerificationData } from './utils/qrcode';
 import {
   loadInvoices,
@@ -32,6 +33,7 @@ import {
   Smartphone,
   Save,
   ChevronRight,
+  Lock,
 } from 'lucide-react';
 
 const createEmptyInvoice = (seq = '08', currentPackages = PACKAGE_OPTIONS) => {
@@ -135,6 +137,14 @@ function App() {
       }
     }
     return null;
+  });
+
+  // Admin Authentication State (protected by password 'sasiera')
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('photobo_admin_auth') === 'true';
+    }
+    return false;
   });
 
   const previewRef = useRef(null);
@@ -270,6 +280,14 @@ function App() {
     showToast('Pengaturan studio berhasil diperbarui!');
   };
 
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('photobo_admin_auth');
+    }
+    setIsAuthenticated(false);
+    showToast('Sistem telah dikunci kembali.');
+  };
+
   if (verificationData) {
     return (
       <InvoiceVerificationView
@@ -284,6 +302,11 @@ function App() {
         }}
       />
     );
+  }
+
+  // Admin Authentication Gate - requires password 'sasiera'
+  if (!isAuthenticated) {
+    return <AuthGateView onLoginSuccess={() => setIsAuthenticated(true)} />;
   }
 
   const isMobile = windowWidth < 1024;
@@ -374,6 +397,14 @@ function App() {
               title="Pengaturan Studio"
             >
               <Settings className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="p-1.5 sm:p-2 bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-amber-400 border border-stone-800 rounded-xl transition"
+              title="Kunci Sistem (Logout)"
+            >
+              <Lock className="w-4 h-4" />
             </button>
           </div>
         </div>

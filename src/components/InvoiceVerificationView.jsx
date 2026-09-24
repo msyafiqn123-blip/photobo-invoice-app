@@ -13,6 +13,7 @@ import {
   Sparkles,
   ArrowRight,
   ShieldCheck,
+  Lock,
 } from 'lucide-react';
 
 const InvoiceVerificationView = ({ data, onBackToApp }) => {
@@ -219,10 +220,11 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
             <button
               type="button"
               onClick={onBackToApp}
-              className="w-full flex items-center justify-center gap-2 p-3 bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-300 text-xs font-semibold rounded-2xl transition"
+              className="w-full flex items-center justify-center gap-2 p-3 bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-stone-200 text-xs font-semibold rounded-2xl transition"
             >
-              <span>Buka Aplikasi Generator Invoice</span>
-              <ArrowRight className="w-4 h-4" />
+              <Lock className="w-3.5 h-3.5 text-stone-500" />
+              <span>Akses Generator Invoice (Khusus Admin)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
