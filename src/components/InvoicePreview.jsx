@@ -37,20 +37,16 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
     switch (docType) {
       case 'TAGIHAN_DP':
         return {
-          title: 'NOTA TAGIHAN DP',
+          title: 'NOTA PEMBAYARAN',
           recipientLabel: 'DITAGIHKAN KEPADA',
           note: 'Mohon lakukan pembayaran DP untuk konfirmasi jadwal.',
-          badge: 'MENUNGGU DP',
-          badgeClass: 'bg-amber-800 text-amber-100',
           showStamp: false,
         };
       case 'TAGIHAN_PELUNASAN':
         return {
-          title: 'TAGIHAN PELUNASAN',
-          recipientLabel: 'DITAGIHKAN KEPADA',
-          note: 'Mohon lakukan pelunasan maksimal H-1 tanggal pelaksanaan.',
-          badge: 'TAGIHAN PELUNASAN H-1',
-          badgeClass: 'bg-[#9A3412] text-orange-100',
+          title: 'NOTA PEMBAYARAN',
+          recipientLabel: 'TELAH DITERIMA PEMBAYARAN DARI',
+          note: studioSettings.validityNote || 'Invoice ini adalah bukti pembayaran yang sah',
           showStamp: false,
         };
       case 'BUKTI_LUNAS':
@@ -58,8 +54,6 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
           title: 'NOTA PEMBAYARAN',
           recipientLabel: 'TELAH DITERIMA PEMBAYARAN DARI',
           note: studioSettings.validityNote || 'Invoice ini adalah bukti pembayaran yang sah',
-          badge: 'LUNAS / PAID',
-          badgeClass: 'bg-emerald-800 text-emerald-100',
           showStamp: hasStamp !== false,
           isLunas: true,
         };
@@ -69,13 +63,16 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
           title: 'NOTA PEMBAYARAN',
           recipientLabel: 'TELAH DITERIMA PEMBAYARAN DARI',
           note: studioSettings.validityNote || 'Invoice ini adalah bukti pembayaran yang sah',
-          badge: null,
           showStamp: hasStamp !== false,
         };
     }
   };
 
   const docConfig = getDocTypeHeader();
+  const isLunas =
+    docConfig.isLunas ||
+    docType === 'BUKTI_LUNAS' ||
+    (summary.remainingBalance !== undefined && Number(summary.remainingBalance) === 0);
 
   return (
     <div
@@ -152,21 +149,13 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
         {/* UPPER SECTION */}
         <div>
           {/* Header Row: Big Bold INVOICE Serif Title in the raised left tab */}
-          <div className="flex items-center justify-between pb-3">
+          <div className="pb-3">
             <h1
               className="text-[56px] font-black tracking-[0.05em] text-[#160C10] leading-none"
               style={{ fontFamily: '"Bodoni Moda", "Playfair Display", Georgia, serif' }}
             >
               INVOICE
             </h1>
-
-            {docConfig.badge && (
-              <span
-                className={`text-[11.5px] font-extrabold tracking-wider px-3.5 py-1.5 rounded-full uppercase shadow-sm ${docConfig.badgeClass}`}
-              >
-                {docConfig.badge}
-              </span>
-            )}
           </div>
 
           {/* Metadata 2 Columns Grid */}
@@ -285,6 +274,16 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
                   {formatRupiah(summary.remainingBalance ?? 0)}
                 </span>
               </div>
+
+              {/* Status Lunas dibawah Sisa Pembayaran */}
+              {isLunas && (
+                <div className="flex justify-end pr-4 pt-1">
+                  <span className="inline-flex items-center gap-1.5 text-[11.5px] font-black tracking-widest px-3 py-1 rounded-full bg-[#065F46] text-white uppercase shadow-sm">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    LUNAS / PAID
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
