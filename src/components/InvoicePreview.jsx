@@ -131,11 +131,11 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
       </svg>
 
       {/* 2. Top Right PHOTOBO Camera Logo (Bold & Beautifully Proportioned) */}
-      <div className="absolute top-[32px] right-[48px] z-10">
+      <div className="absolute top-[-6px] right-[48px] z-10">
         <img
           src="/photobo_logo_white.png"
           alt="Photobo Logo"
-          className="w-[230px] h-auto object-contain"
+          className="w-[210px] h-auto object-contain"
         />
       </div>
 
@@ -184,8 +184,8 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
               </div>
             </div>
 
-            {/* Right Column: Client Information (Right Aligned) */}
-            <div className="text-right">
+            {/* Right Column: Client Information (Right Aligned, gracefully placed inside cream card) */}
+            <div className="text-right pt-[34px]">
               <div className="font-bold tracking-wider uppercase text-black text-[13px]">
                 {docConfig.recipientLabel}
               </div>
