@@ -142,7 +142,7 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
         style={{
           width: '794px',
           height: '1123px',
-          padding: '96px 54px 34px 54px',
+          padding: '96px 54px 64px 54px',
           boxSizing: 'border-box',
         }}
       >
