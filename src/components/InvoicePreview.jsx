@@ -250,7 +250,7 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1 }, ref) => {
                       </div>
 
                       {/* Jenis Pembayaran */}
-                      <div className="w-[19%] text-center font-black tracking-wider uppercase text-black text-[13px]">
+                      <div className="w-[19%] text-center font-normal tracking-wider uppercase text-black text-[13px]">
                         {item.paymentType}
                       </div>
 
