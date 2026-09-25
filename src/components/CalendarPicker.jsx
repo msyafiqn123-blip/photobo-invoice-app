@@ -3,6 +3,7 @@ import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Clock,
   Check,
   X,
@@ -192,16 +193,16 @@ const CalendarPicker = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full bg-stone-950 border border-stone-800 hover:border-amber-500/60 rounded-xl px-3 py-2 text-left text-xs sm:text-sm text-stone-200 flex items-center justify-between gap-2 transition group shadow-sm focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+        className="w-full bg-stone-950 border border-stone-800 hover:border-amber-500/60 rounded-xl px-2.5 py-2 text-left text-xs sm:text-sm text-stone-200 flex items-center justify-between gap-1.5 transition group shadow-sm focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer overflow-hidden"
       >
-        <div className="flex items-center gap-2 min-w-0 flex-1">
+        <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
           <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-105 transition shrink-0">
             <CalendarIcon className="w-3.5 h-3.5" />
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 flex items-center gap-1.5 overflow-hidden">
             {value ? (
-              <div className="flex items-center gap-1.5 flex-wrap sm:flex-nowrap">
-                <span className="font-bold text-stone-100 text-xs sm:text-sm whitespace-nowrap">
+              <>
+                <span className="font-bold text-stone-100 text-xs sm:text-sm truncate">
                   {formatDateIndo(value)}
                 </span>
                 {dayOfWeek && (
@@ -209,18 +210,14 @@ const CalendarPicker = ({
                     {dayOfWeek}
                   </span>
                 )}
-              </div>
+              </>
             ) : (
-              <span className="text-stone-500 italic text-xs whitespace-nowrap">{placeholder}</span>
+              <span className="text-stone-500 italic text-xs truncate">{placeholder}</span>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 shrink-0 pl-1">
-          <span className="text-[10px] text-amber-400 bg-amber-950/60 border border-amber-800/80 px-2 py-0.5 rounded font-bold group-hover:bg-amber-900/60 transition">
-            PILIH
-          </span>
-        </div>
+        <ChevronDown className="w-3.5 h-3.5 text-stone-500 group-hover:text-amber-400 transition shrink-0 ml-1" />
       </button>
 
       {/* Calendar Dropdown Popover */}

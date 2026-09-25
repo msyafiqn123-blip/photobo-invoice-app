@@ -144,7 +144,7 @@ const WhatsAppModal = ({ isOpen, onClose, invoice, settings }) => {
           {/* PDF Attachment Card */}
           <div>
             <label className="text-xs font-semibold text-stone-400 uppercase tracking-wider block mb-1">
-              Lampiran Dokumen Invoice (PDF A5)
+              Lampiran Dokumen Invoice (PDF)
             </label>
             <div className="bg-stone-950/80 border border-stone-800/80 rounded-xl p-3.5 flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">

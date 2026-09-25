@@ -293,7 +293,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
       {/* 1. Mode Dokumen Switcher */}
       <div>
         <label className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-2">
-          Pilih Status Dokumen (1-Klik Switch)
+          Pilih Status Dokumen
         </label>
         <div className="grid grid-cols-2 gap-2">
           {DOC_TYPES.map((dt) => {
@@ -322,7 +322,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
         {/* Header Pilihan Paket */}
         <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
           <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>Pilihan Paket Photobooth (Kode DD)</span>
+          <span>Pilihan Paket Photobooth</span>
         </div>
 
         {/* Dropdown Paket Layanan */}
@@ -350,7 +350,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
             <strong className="text-xs font-bold text-stone-100">{currentPkg.durationHours} Jam Acara</strong>
           </div>
           <div className="bg-stone-900/80 border border-stone-800/80 rounded-xl p-2">
-            <span className="text-[10px] text-stone-400 block font-medium">Cetak Cetakan</span>
+            <span className="text-[10px] text-stone-400 block font-medium">Format Cetak</span>
             <strong className="text-xs font-bold text-amber-300">{currentPkg.printType}</strong>
           </div>
           <div className="bg-stone-900/80 border border-stone-800/80 rounded-xl p-2">
@@ -395,16 +395,13 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
               <span className="font-mono font-black text-amber-300 text-lg sm:text-xl tracking-wider select-all">
                 {invoice.invoiceCode || 'INV 01.08/I/03/26'}
               </span>
-              <span className="text-[10px] text-stone-500 font-mono">
-                AA.BB/CC/DD/YY
-              </span>
             </div>
           )}
 
           {/* Formula breakdown tags */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] pt-1">
             <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
-              <span className="text-stone-500 block text-[9px] uppercase font-semibold">AA (Tahap)</span>
+              <span className="text-stone-500 block text-[9px] uppercase font-semibold">Tahap</span>
               <strong className="text-amber-200">
                 {invoice.stageCode === '02' ? '02 (Lunas)' : '01 (DP)'}
               </strong>
@@ -412,7 +409,7 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
 
             <div className="bg-stone-900/80 border border-amber-500/40 rounded-lg px-2.5 py-1.5 flex flex-col justify-between">
               <span className="text-stone-400 block text-[9px] uppercase font-semibold">
-                BB (No. Urut)
+                No. Urut
               </span>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <button
@@ -455,14 +452,14 @@ const InvoiceForm = ({ invoice, onChange, onSave, onReset, isSaving, onViewPdf, 
             </div>
 
             <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
-              <span className="text-stone-500 block text-[9px] uppercase font-semibold">CC (Bulan)</span>
+              <span className="text-stone-500 block text-[9px] uppercase font-semibold">Bulan</span>
               <strong className="text-amber-200">
                 {invoice.invoiceCode?.split('/')[1] || 'IX'}
               </strong>
             </div>
 
             <div className="bg-stone-900/80 border border-stone-800 rounded-lg px-2.5 py-1.5">
-              <span className="text-stone-500 block text-[9px] uppercase font-semibold">DD (Paket)</span>
+              <span className="text-stone-500 block text-[9px] uppercase font-semibold">Paket</span>
               <strong className="text-amber-200 truncate block" title={currentPkg.name}>
                 {invoice.packageCode || '03'} ({currentPkg.name})
               </strong>

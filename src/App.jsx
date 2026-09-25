@@ -249,13 +249,13 @@ function App() {
       setActiveInvoice(invToDownload);
     }
 
-    showToast('Menyiapkan file PDF ukuran A5 (148 × 210 mm)...');
+    showToast('Menyiapkan file PDF...');
     try {
       // Small delay to ensure activeInvoice state updates if target was changed
       await new Promise((r) => setTimeout(r, 60));
       const filename = `${target.invoiceCode || 'INVOICE'} - ${target.client?.name || 'Photobo'}.pdf`.replace(/[\/\\:]/g, '_');
       await downloadInvoicePdf('invoice-document-master', filename, 'a5');
-      showToast('PDF A5 berhasil diunduh!');
+      showToast('PDF berhasil diunduh!');
     } catch (err) {
       console.error(err);
       showToast('Gagal mengunduh PDF.');
@@ -485,10 +485,7 @@ function App() {
                 <div className="no-print w-full flex items-center justify-between bg-stone-900/90 border border-stone-800 rounded-2xl px-4 py-2 mb-3">
                   <div className="flex items-center gap-2 text-xs font-bold text-stone-300">
                     <Eye className="w-4 h-4 text-amber-400" />
-                    <span>Live Preview A5 (148 × 210 mm)</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                      Format A5
-                    </span>
+                    <span>Live Preview</span>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -565,7 +562,7 @@ function App() {
                 {/* Mobile Zoom Controls */}
                 <div className="flex items-center justify-between bg-stone-900 border border-stone-800 rounded-xl px-3 py-2 text-xs">
                   <div className="flex items-center gap-1.5 font-bold text-amber-400">
-                    <span>Preview A5</span>
+                    <span>Live Preview</span>
                     <span className="text-[10px] text-stone-400">({Math.round(previewScale * 100)}%)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
