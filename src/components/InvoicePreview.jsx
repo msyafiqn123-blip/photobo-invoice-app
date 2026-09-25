@@ -204,40 +204,46 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1, id = 'invoice
             </h1>
           </div>
 
-          {/* Metadata 2 Columns Grid */}
-          <div className="grid grid-cols-2 gap-6 pt-3 pb-4">
+          {/* Metadata 2 Columns Section with explicit fixed height for 100% bulletproof PDF export */}
+          <div
+            className="flex justify-between items-start mt-4 mb-6"
+            style={{
+              height: '110px',
+              boxSizing: 'border-box',
+            }}
+          >
             {/* Left Column: Nota Title, Code, Date */}
-            <div>
-              <div className="font-black text-[16px] tracking-wide uppercase text-black">
+            <div className="w-[50%]">
+              <div className="font-black text-[16px] tracking-wide uppercase text-black leading-tight">
                 {docConfig.title}
               </div>
-              <div className="text-black font-bold text-[14.5px] tracking-wide mt-1">
+              <div className="text-black font-bold text-[14.5px] tracking-wide mt-1 leading-tight">
                 {invoiceCode}
               </div>
-              <div className="text-black font-semibold text-[14px] mt-0.5">
+              <div className="text-black font-semibold text-[14px] mt-1 leading-tight">
                 {formatDateIndo(invoiceDate)}
               </div>
             </div>
 
-            {/* Right Column: Client Information (Right Aligned, gracefully placed inside cream card) */}
-            <div className="text-right pt-[34px]">
-              <div className="font-bold tracking-wider uppercase text-black text-[13px]">
+            {/* Right Column: Client Information (Right Aligned, compact and clean) */}
+            <div className="w-[50%] text-right space-y-0.5">
+              <div className="font-bold tracking-wider uppercase text-black text-[12.5px] leading-tight">
                 {docConfig.recipientLabel}
               </div>
-              <div className="font-black text-[18px] tracking-wide text-black uppercase mt-0.5 truncate">
+              <div className="font-black text-[17px] tracking-wide text-black uppercase truncate leading-tight">
                 {client.name || 'NAMA KLIEN'}
               </div>
-              <div className="text-black font-semibold text-[14px] mt-0.5">
+              <div className="text-black font-semibold text-[13.5px] leading-tight">
                 {client.phone || '08XX-XXXX-XXXX'}
               </div>
-              <div className="text-black font-medium text-[14px] mt-0.5 truncate">
+              <div className="text-black font-medium text-[13.5px] truncate leading-tight">
                 {client.location || 'Kota, Provinsi'}
               </div>
             </div>
           </div>
 
           {/* Transaction Table */}
-          <div className="mt-1">
+          <div className="mt-4" style={{ marginTop: '24px' }}>
             {/* Table Header Row: Prominent Pitch Black Bar */}
             <div className="bg-[#160C10] text-white flex items-center px-4 py-2 rounded-[5px] h-[48px] text-[13px] font-black tracking-wider shadow-sm">
               <div className="w-[44%] text-left pl-3">DESKRIPSI</div>
@@ -331,14 +337,11 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1, id = 'invoice
               )}
 
               {/* QR Code Verifikasi Pembayaran Rata Kanan dibawah Sisa Pembayaran */}
-              <div className="flex items-center justify-end gap-3 pt-2.5 pr-4">
-                <div className="text-right space-y-0.5">
-                  <div className="font-black text-[12px] tracking-wider uppercase text-black">
-                    PINDAI UNTUK VERIFIKASI RESMI
-                  </div>
-                  <div className="text-[11px] font-bold text-black/85">
-                    Cek status dan sisa tagihan
-                  </div>
+              <div className="flex items-center justify-end gap-2 pt-2.5 pr-4">
+                <div className="text-right leading-tight font-black text-black tracking-wide text-[12px]">
+                  <div>Scan</div>
+                  <div>For</div>
+                  <div>Verification</div>
                 </div>
                 <div className="p-1 bg-white border border-black/40 rounded-xl shadow-sm shrink-0">
                   {qrCodeDataUrl ? (
