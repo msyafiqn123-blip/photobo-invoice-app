@@ -50,6 +50,20 @@ export const getVerificationUrl = (invoice) => {
     invoice.docType === 'BUKTI_LUNAS' ||
     (invoice.summary?.remainingBalance !== undefined && Number(invoice.summary?.remainingBalance) === 0);
 
+  // Extract print type (e.g. Unlimited 2R / 4R / Strip)
+  const printType =
+    invoice.event?.printType ||
+    invoice.items?.[0]?.description?.split('\n')?.[1] ||
+    'Unlimited 2R';
+
+  const packagePrice =
+    Number(invoice.summary?.totalPackagePrice) ||
+    Number(invoice.items?.[0]?.price) ||
+    0;
+
+  const discounts = Number(invoice.summary?.totalDiscounts) || 0;
+  const additionals = Number(invoice.summary?.totalAdditionals) || 0;
+
   const payload = {
     id: invoice.id || '',
     c: invoice.invoiceCode || '',
@@ -58,6 +72,10 @@ export const getVerificationUrl = (invoice) => {
     l: invoice.client?.location || '',
     d: invoice.event?.date || '',
     pkg: invoice.event?.packageName || '',
+    pt: printType,
+    pr: packagePrice,
+    dc: discounts,
+    ad: additionals,
     tot: invoice.summary?.grandTotal || 0,
     paid: invoice.summary?.totalPaidSoFar || 0,
     rem: invoice.summary?.remainingBalance || 0,
@@ -84,6 +102,10 @@ export const parseVerificationData = (searchParams) => {
         clientLocation: parsed.l,
         eventDate: parsed.d,
         packageName: parsed.pkg,
+        printType: parsed.pt || 'Unlimited 2R',
+        packagePrice: Number(parsed.pr) || 0,
+        discounts: Number(parsed.dc) || 0,
+        additionals: Number(parsed.ad) || 0,
         grandTotal: Number(parsed.tot) || 0,
         totalPaid: Number(parsed.paid) || 0,
         remainingBalance: Number(parsed.rem) || 0,

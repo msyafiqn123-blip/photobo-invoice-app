@@ -289,19 +289,7 @@ function App() {
   };
 
   if (verificationData) {
-    return (
-      <InvoiceVerificationView
-        data={verificationData}
-        onBackToApp={() => {
-          if (typeof window !== 'undefined') {
-            const url = new URL(window.location.href);
-            url.search = '';
-            window.history.replaceState({}, document.title, url.pathname);
-          }
-          setVerificationData(null);
-        }}
-      />
-    );
+    return <InvoiceVerificationView data={verificationData} />;
   }
 
   // Admin Authentication Gate - requires password 'sasiera'

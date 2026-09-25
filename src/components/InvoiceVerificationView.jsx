@@ -4,19 +4,17 @@ import { getWhatsAppLink } from '../utils/whatsapp';
 import {
   CheckCircle2,
   Clock,
-  AlertCircle,
   FileCheck,
-  Calendar,
-  User,
-  CreditCard,
   MessageCircle,
   Sparkles,
-  ArrowRight,
   ShieldCheck,
-  Lock,
+  Printer,
+  Tag,
+  Receipt,
+  Check,
 } from 'lucide-react';
 
-const InvoiceVerificationView = ({ data, onBackToApp }) => {
+const InvoiceVerificationView = ({ data }) => {
   if (!data) return null;
 
   const {
@@ -25,7 +23,11 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
     clientPhone = '',
     clientLocation = '',
     eventDate = '',
-    packageName = 'Photobooth',
+    packageName = 'Photobooth 4 Hours',
+    printType = '',
+    packagePrice = 0,
+    discounts = 0,
+    additionals = 0,
     grandTotal = 0,
     totalPaid = 0,
     remainingBalance = 0,
@@ -38,8 +40,27 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
   const isDpOnly = !isLunas && totalPaid > 0 && remainingBalance > 0;
   const isPendingFull = !isLunas && totalPaid === 0;
 
+  // Smart fallback for print type (e.g. Unlimited 2R / 4R / Strip)
+  const finalPrintType =
+    printType ||
+    (packageName?.toLowerCase().includes('4r')
+      ? 'Unlimited 4R'
+      : packageName?.toLowerCase().includes('strip')
+      ? 'Unlimited Strip'
+      : 'Unlimited 2R');
+
+  // Smart fallback for package price
+  const finalPackagePrice =
+    packagePrice > 0
+      ? packagePrice
+      : grandTotal > 0
+      ? Math.max(grandTotal, grandTotal + discounts - additionals)
+      : 2500000;
+
   // WhatsApp message for customer inquiry
-  const waMsg = `Halo Photobo Studio, saya sedang melihat verifikasi invoice *${invoiceCode}* a.n. *${clientName}*. Status: ${isLunas ? 'LUNAS' : `Sisa Tagihan Rp ${remainingBalance.toLocaleString('id-ID')}`}.`;
+  const waMsg = `Halo Photobo Studio, saya sedang melihat verifikasi invoice *${invoiceCode}* a.n. *${clientName}*. Status: ${
+    isLunas ? 'LUNAS' : `Sisa Tagihan Rp ${remainingBalance.toLocaleString('id-ID')}`
+  }.`;
   const waUrl = getWhatsAppLink('0811-1332-931', waMsg);
 
   return (
@@ -65,7 +86,7 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
 
         {/* Status Hero Card */}
         <div
-          className={`rounded-3xl p-6 sm:p-7 border shadow-2xl text-center space-y-3 ${
+          className={`rounded-3xl p-6 sm:p-7 border shadow-2xl text-center space-y-4 ${
             isLunas
               ? 'bg-gradient-to-b from-emerald-950/60 to-stone-950 border-emerald-500/40 text-emerald-300'
               : isDpOnly
@@ -109,22 +130,30 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
             </p>
           </div>
 
-          {/* Sisa Tagihan Highlight */}
-          <div className="bg-stone-950/80 border border-stone-800/80 rounded-2xl p-4 mt-2 grid grid-cols-2 gap-3 text-left">
+          {/* Ringkasan Finansial 3 Kolom */}
+          <div className="bg-stone-950/80 border border-stone-800/80 rounded-2xl p-4 grid grid-cols-3 gap-2 text-center">
             <div>
               <span className="text-[10px] text-stone-400 font-semibold block uppercase">
-                Total Tagihan Acara
+                Total Tagihan
               </span>
-              <span className="text-base sm:text-lg font-black font-mono text-stone-100">
+              <span className="text-xs sm:text-base font-black font-mono text-stone-100 block mt-0.5">
                 {formatRupiah(grandTotal)}
               </span>
             </div>
-            <div className="text-right">
+            <div>
               <span className="text-[10px] text-stone-400 font-semibold block uppercase">
-                Sisa Pembayaran
+                Telah Masuk
+              </span>
+              <span className="text-xs sm:text-base font-black font-mono text-emerald-400 block mt-0.5">
+                {formatRupiah(totalPaid)}
+              </span>
+            </div>
+            <div>
+              <span className="text-[10px] text-stone-400 font-semibold block uppercase">
+                Sisa Tagihan
               </span>
               <span
-                className={`text-base sm:text-lg font-black font-mono ${
+                className={`text-xs sm:text-base font-black font-mono block mt-0.5 ${
                   isLunas ? 'text-emerald-400' : 'text-rose-400'
                 }`}
               >
@@ -138,7 +167,7 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
         <div className="bg-stone-900/90 border border-stone-800 rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl">
           <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider pb-2 border-b border-stone-800">
             <Sparkles className="w-4 h-4" />
-            <span>Rincian Dokumen Resmi</span>
+            <span>Rincian Dokumen & Layanan Resmi</span>
           </div>
 
           <div className="space-y-3 text-xs sm:text-sm">
@@ -179,23 +208,97 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
               </div>
             )}
 
-            {packageName && (
-              <div className="flex justify-between py-1 border-b border-stone-800/60">
-                <span className="text-stone-400">Paket Layanan</span>
-                <span className="font-bold text-amber-300 text-right">
-                  {packageName}
+            {/* Paket Layanan */}
+            <div className="flex justify-between py-1 border-b border-stone-800/60">
+              <span className="text-stone-400">Paket Layanan</span>
+              <span className="font-bold text-amber-300 text-right">
+                {packageName || 'Photobooth'}
+              </span>
+            </div>
+
+            {/* Detail Format / Ukuran Cetak */}
+            <div className="flex justify-between items-center py-1.5 border-b border-stone-800/60">
+              <span className="text-stone-400 flex items-center gap-1.5">
+                <Printer className="w-3.5 h-3.5 text-amber-400" />
+                <span>Detail Format Cetak</span>
+              </span>
+              <span className="font-extrabold text-stone-100 bg-stone-800 px-3 py-1 rounded-lg border border-stone-700 text-right tracking-wide">
+                {finalPrintType}
+              </span>
+            </div>
+
+            {/* Rincian Biaya & Pembayaran */}
+            <div className="pt-2 pb-1 text-xs font-bold text-stone-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Receipt className="w-3.5 h-3.5 text-stone-400" />
+              <span>Rincian Biaya & Pembayaran</span>
+            </div>
+
+            {/* Harga Paket Layanan */}
+            <div className="flex justify-between py-1 border-b border-stone-800/60 pl-2">
+              <span className="text-stone-400">Harga Paket</span>
+              <span className="font-mono font-bold text-stone-200">
+                {formatRupiah(finalPackagePrice)}
+              </span>
+            </div>
+
+            {/* Biaya Tambahan (jika ada) */}
+            {additionals > 0 && (
+              <div className="flex justify-between py-1 border-b border-stone-800/60 pl-2">
+                <span className="text-stone-400">Biaya Tambahan / Transport</span>
+                <span className="font-mono font-bold text-stone-300">
+                  + {formatRupiah(additionals)}
                 </span>
               </div>
             )}
 
-            <div className="flex justify-between py-1 border-b border-stone-800/60">
-              <span className="text-stone-400">Sudah Dibayar</span>
-              <span className="font-mono font-bold text-emerald-400">
+            {/* Diskon / Potongan Harga */}
+            <div className="flex justify-between py-1 border-b border-stone-800/60 pl-2">
+              <span className="text-stone-400 flex items-center gap-1">
+                <Tag className="w-3 h-3 text-stone-400" />
+                <span>Diskon / Promo</span>
+              </span>
+              <span
+                className={`font-mono font-bold ${
+                  discounts > 0 ? 'text-emerald-400' : 'text-stone-400'
+                }`}
+              >
+                {discounts > 0 ? `- ${formatRupiah(discounts)}` : 'Rp 0'}
+              </span>
+            </div>
+
+            {/* Total Tagihan Acara */}
+            <div className="flex justify-between py-1.5 border-b border-stone-800/60 bg-stone-950/60 px-3 rounded-xl">
+              <span className="text-stone-200 font-bold">Total Tagihan Acara</span>
+              <span className="font-mono font-black text-amber-300 text-sm sm:text-base">
+                {formatRupiah(grandTotal)}
+              </span>
+            </div>
+
+            {/* Pembayaran Telah Masuk (Sudah Dibayar) */}
+            <div className="flex justify-between py-1.5 border-b border-stone-800/60 bg-emerald-950/25 border border-emerald-500/20 px-3 rounded-xl">
+              <span className="text-emerald-300 font-bold flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Pembayaran Telah Masuk</span>
+              </span>
+              <span className="font-mono font-black text-emerald-400 text-sm sm:text-base">
                 {formatRupiah(totalPaid)}
               </span>
             </div>
 
-            <div className="flex justify-between py-1">
+            {/* Sisa Pembayaran */}
+            <div className="flex justify-between py-1.5 border-b border-stone-800/60 px-3 rounded-xl">
+              <span className="text-stone-200 font-bold">Sisa Pembayaran</span>
+              <span
+                className={`font-mono font-black text-sm sm:text-base ${
+                  isLunas ? 'text-emerald-400' : 'text-rose-400'
+                }`}
+              >
+                {isLunas ? 'Rp 0 (LUNAS)' : formatRupiah(remainingBalance)}
+              </span>
+            </div>
+
+            {/* Rekening Resmi */}
+            <div className="flex justify-between py-1 pt-2">
               <span className="text-stone-400">Rekening Resmi Studio</span>
               <span className="font-semibold text-stone-300 text-right">
                 {accountNumber}
@@ -204,7 +307,7 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Button: Only WhatsApp Confirmation for Customer */}
         <div className="space-y-3 pt-2">
           <a
             href={waUrl}
@@ -215,24 +318,12 @@ const InvoiceVerificationView = ({ data, onBackToApp }) => {
             <MessageCircle className="w-5 h-5" />
             <span>Konfirmasi ke WhatsApp Photobo Studio</span>
           </a>
-
-          {onBackToApp && (
-            <button
-              type="button"
-              onClick={onBackToApp}
-              className="w-full flex items-center justify-center gap-2 p-3 bg-stone-900 hover:bg-stone-800 border border-stone-800 text-stone-400 hover:text-stone-200 text-xs font-semibold rounded-2xl transition"
-            >
-              <Lock className="w-3.5 h-3.5 text-stone-500" />
-              <span>Akses Generator Invoice (Khusus Admin)</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
         </div>
 
         {/* Footer Note */}
         <div className="text-center text-[11px] text-stone-500 pt-2">
           <p>© {new Date().getFullYear()} Photobo Studio. Hak Cipta Dilindungi.</p>
-          <p className="mt-0.5">Dokumen ini merupakan verifikasi digital yang sah dan terenkripsi.</p>
+          <p className="mt-0.5">Dokumen ini merupakan verifikasi digital resmi yang terenkripsi.</p>
         </div>
       </div>
     </div>
