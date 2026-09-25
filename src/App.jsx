@@ -15,8 +15,10 @@ import {
   saveSettings,
   INITIAL_SAMPLE_INVOICES,
 } from './services/storage';
-import { generateInvoiceCode } from './utils/invoiceCode';
+import { generateInvoiceCode, PACKAGE_OPTIONS } from './utils/invoiceCode';
 import { downloadInvoicePdf, printInvoice } from './utils/exportPdf';
+import CustomerOrderView from './components/CustomerOrderView';
+import { parseOrderData, createInvoiceFromOrderData } from './utils/order';
 import {
   FileText,
   Download,
@@ -34,6 +36,7 @@ import {
   Save,
   ChevronRight,
   Lock,
+  ExternalLink,
 } from 'lucide-react';
 
 const createEmptyInvoice = (seq = '08', currentPackages = PACKAGE_OPTIONS) => {
@@ -128,6 +131,24 @@ function App() {
   const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  // Check if current URL is a customer order page (/order or ?order=1)
+  const isOrderRoute = typeof window !== 'undefined' && (
+    window.location.pathname === '/order' ||
+    window.location.pathname.startsWith('/order') ||
+    new URLSearchParams(window.location.search).get('order') === '1'
+  );
+
+  // Check incoming order data (?orderData=...) for automatic invoice creation
+  const [pendingOrderData, setPendingOrderData] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('orderData')) {
+        return parseOrderData(sp);
+      }
+    }
+    return null;
+  });
+
   // Check if current URL is a verification link (?verify=1 or ?v=...)
   const [verificationData, setVerificationData] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -193,6 +214,39 @@ function App() {
     };
     init();
   }, []);
+
+  // Handle auto-creating invoice when incoming order data is present and admin is authenticated
+  useEffect(() => {
+    if (isAuthenticated && pendingOrderData && invoices.length > 0) {
+      let maxSeq = 8;
+      invoices.forEach((inv) => {
+        const num = parseInt(inv.sequenceNumber || '0', 10);
+        if (!isNaN(num) && num > maxSeq) {
+          maxSeq = num;
+        }
+      });
+      const nextSeq = String(maxSeq + 1).padStart(2, '0');
+      const newInv = createInvoiceFromOrderData(
+        pendingOrderData,
+        settings?.packages,
+        nextSeq,
+        settings
+      );
+
+      saveInvoice(newInv).then((updatedList) => {
+        setInvoices(updatedList);
+        setActiveInvoice(newInv);
+        setDesktopTab('EDITOR');
+        setMobileTab('FORM');
+        showToast(`Invoice baru nomor urut ${nextSeq} untuk ${pendingOrderData.name} berhasil dimuat dari Order WhatsApp!`);
+      });
+
+      if (typeof window !== 'undefined' && window.history?.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      setPendingOrderData(null);
+    }
+  }, [isAuthenticated, pendingOrderData, invoices, settings]);
 
   const showToast = (message) => {
     setNotification(message);
@@ -288,6 +342,11 @@ function App() {
     showToast('Sistem telah dikunci kembali.');
   };
 
+  // Customer Order Page (Public)
+  if (isOrderRoute) {
+    return <CustomerOrderView />;
+  }
+
   if (verificationData) {
     return <InvoiceVerificationView data={verificationData} />;
   }
@@ -378,6 +437,17 @@ function App() {
             >
               <Printer className="w-3.5 h-3.5" />
             </button>
+
+            <a
+              href="/order"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 bg-stone-900 hover:bg-stone-800 text-amber-400 hover:text-amber-300 border border-stone-800 rounded-xl transition text-xs font-bold"
+              title="Buka Halaman Form Order Pelanggan (https://photobo.pics/order)"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden xl:inline">Form Order</span>
+            </a>
 
             <button
               onClick={() => setIsSettingsOpen(true)}
