@@ -36,61 +36,139 @@ export const decodeBase64Url = (base64url) => {
 };
 
 export const getVerificationUrl = (invoice) => {
-  if (!invoice) return 'https://photobo-invoice-app.vercel.app';
+  if (!invoice) return 'https://photobo.pics/';
 
-  // Base URL: Use current origin in browser if not localhost, otherwise production Vercel
-  const baseUrl =
-    typeof window !== 'undefined' &&
-    window.location.hostname !== 'localhost' &&
-    window.location.hostname !== '127.0.0.1'
-      ? `${window.location.origin}/`
-      : 'https://photobo-invoice-app.vercel.app/';
+  // Use the ultra-short custom domain photobo.pics for minimal QR density
+  const baseUrl = 'https://photobo.pics/';
 
   const isLunas =
     invoice.docType === 'BUKTI_LUNAS' ||
     (invoice.summary?.remainingBalance !== undefined && Number(invoice.summary?.remainingBalance) === 0);
 
-  // Extract print type (e.g. Unlimited 2R / 4R / Strip)
-  const printType =
+  // Compact code: e.g. "INV 01.08/I/03/26" -> "01.08-I-03-26"
+  const rawCode = (invoice.invoiceCode || '').trim();
+  const cleanCode = rawCode.replace(/^INV\s*/i, '').replace(/\//g, '-');
+
+  const name = (invoice.client?.name || '').trim();
+  const phone = (invoice.client?.phone || '').replace(/\D/g, '');
+  const loc = (invoice.client?.location || '').trim();
+  const date = (invoice.event?.date || '').trim();
+
+  // Shorten package name: "Photobooth 4 Jam" -> "4 Jam"
+  const rawPkg = invoice.event?.packageName || 'Photobooth';
+  const pkg = rawPkg.replace(/^Photobooth\s*/i, '').trim();
+
+  // Shorten print type: "Unlimited 2R" -> "2R"
+  const rawPt =
     invoice.event?.printType ||
     invoice.items?.[0]?.description?.split('\n')?.[1] ||
     'Unlimited 2R';
+  const pt = rawPt.replace(/^Unlimited\s*/i, '').trim();
 
+  // Prices in thousands (k) to drastically reduce digits: 2500000 -> 2500
   const packagePrice =
     Number(invoice.summary?.totalPackagePrice) ||
     Number(invoice.items?.[0]?.price) ||
     0;
+  const prK = Math.round(packagePrice / 1000);
+  const dcK = Math.round((Number(invoice.summary?.totalDiscounts) || 0) / 1000);
+  const adK = Math.round((Number(invoice.summary?.totalAdditionals) || 0) / 1000);
+  const paidK = Math.round((Number(invoice.summary?.totalPaidSoFar) || 0) / 1000);
+  const isLun = isLunas ? 1 : 0;
 
-  const discounts = Number(invoice.summary?.totalDiscounts) || 0;
-  const additionals = Number(invoice.summary?.totalAdditionals) || 0;
+  const fields = [
+    cleanCode,
+    name,
+    phone,
+    loc,
+    date,
+    pkg,
+    pt,
+    prK,
+    dcK,
+    adK,
+    paidK,
+    isLun,
+  ];
 
-  const payload = {
-    id: invoice.id || '',
-    c: invoice.invoiceCode || '',
-    n: invoice.client?.name || '',
-    p: invoice.client?.phone || '',
-    l: invoice.client?.location || '',
-    d: invoice.event?.date || '',
-    pkg: invoice.event?.packageName || '',
-    pt: printType,
-    pr: packagePrice,
-    dc: discounts,
-    ad: additionals,
-    tot: invoice.summary?.grandTotal || 0,
-    paid: invoice.summary?.totalPaidSoFar || 0,
-    rem: invoice.summary?.remainingBalance || 0,
-    st: isLunas ? 'LUNAS' : invoice.docType || 'TAGIHAN_PELUNASAN',
-    acc: invoice.accountNumber || 'BCA 7045166686',
-    dt: invoice.invoiceDate || '',
-  };
+  // Encode each component and delimit with ~ (tilde is unreserved in URLs)
+  const compactPayload = fields
+    .map((s) => encodeURIComponent(String(s ?? '').replace(/~/g, '-')))
+    .join('~');
 
-  const encoded = encodeBase64Url(JSON.stringify(payload));
-  return `${baseUrl}?verify=1&v=${encoded}`;
+  return `${baseUrl}?v=${compactPayload}`;
 };
 
 export const parseVerificationData = (searchParams) => {
   const v = searchParams.get('v');
   if (v) {
+    // 1. New ultra-compact format delimited by '~'
+    if (v.includes('~')) {
+      try {
+        const parts = v.split('~');
+        const rawCode = decodeURIComponent(parts[0] || '').trim();
+        // Restore formatted code e.g. "01.08-I-03-26" -> "INV 01.08/I/03/26"
+        let invoiceCode = rawCode;
+        if (invoiceCode && !invoiceCode.toUpperCase().startsWith('INV')) {
+          invoiceCode = `INV ${invoiceCode.replace(/-/g, '/')}`;
+        }
+
+        const clientName = decodeURIComponent(parts[1] || '').trim() || 'Klien';
+        const clientPhone = decodeURIComponent(parts[2] || '').trim();
+        const clientLocation = decodeURIComponent(parts[3] || '').trim();
+        const eventDate = decodeURIComponent(parts[4] || '').trim();
+
+        // Restore package name
+        let rawPkg = decodeURIComponent(parts[5] || '').trim();
+        const packageName = rawPkg
+          ? (rawPkg.toLowerCase().startsWith('photobooth') ? rawPkg : `Photobooth ${rawPkg}`)
+          : 'Photobooth';
+
+        // Restore print type
+        let rawPt = decodeURIComponent(parts[6] || '').trim();
+        const printType = rawPt
+          ? (rawPt.toLowerCase().startsWith('unlimited') ? rawPt : `Unlimited ${rawPt}`)
+          : 'Unlimited 2R';
+
+        // Multiply thousands back to Rupiah
+        const packagePrice = (Number(parts[7]) || 0) * 1000;
+        const discounts = (Number(parts[8]) || 0) * 1000;
+        const additionals = (Number(parts[9]) || 0) * 1000;
+        let totalPaid = (Number(parts[10]) || 0) * 1000;
+        const isLunas = parts[11] === '1';
+
+        const grandTotal = Math.max(0, packagePrice + additionals - discounts);
+        if (isLunas && totalPaid === 0) {
+          totalPaid = grandTotal;
+        }
+        const remainingBalance = isLunas ? 0 : Math.max(0, grandTotal - totalPaid);
+
+        return {
+          id: `inv-${rawCode}`,
+          invoiceCode,
+          clientName,
+          clientPhone,
+          clientLocation,
+          eventDate,
+          packageName,
+          printType,
+          packagePrice,
+          discounts,
+          additionals,
+          grandTotal,
+          totalPaid,
+          remainingBalance,
+          status: isLunas ? 'LUNAS' : (totalPaid > 0 ? 'DP_DITERIMA' : 'TAGIHAN_PELUNASAN'),
+          accountNumber: 'BCA 7045166686 a.n. Sasiera Diva P',
+          invoiceDate: eventDate,
+          isLunas,
+        };
+      } catch (err) {
+        console.warn('Error parsing compact verification payload:', err);
+      }
+    }
+
+    // 2. Legacy Base64 JSON fallback for older invoices
     try {
       const decodedJson = decodeBase64Url(v);
       const parsed = JSON.parse(decodedJson);
@@ -110,7 +188,7 @@ export const parseVerificationData = (searchParams) => {
         totalPaid: Number(parsed.paid) || 0,
         remainingBalance: Number(parsed.rem) || 0,
         status: parsed.st,
-        accountNumber: parsed.acc,
+        accountNumber: parsed.acc || 'BCA 7045166686 a.n. Sasiera Diva P',
         invoiceDate: parsed.dt,
         isLunas: parsed.st === 'LUNAS' || Number(parsed.rem) === 0,
       };
@@ -139,11 +217,11 @@ export const parseVerificationData = (searchParams) => {
 export const generateQrDataUrl = async (text) => {
   try {
     return await QRCode.toDataURL(text, {
-      width: 240,
+      width: 320,
       margin: 1,
-      errorCorrectionLevel: 'M',
+      errorCorrectionLevel: 'L',
       color: {
-        dark: '#160C10',
+        dark: '#000000',
         light: '#FFFFFF',
       },
     });

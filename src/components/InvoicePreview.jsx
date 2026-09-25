@@ -340,15 +340,15 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1, id = 'invoice
                     Cek status dan sisa tagihan
                   </div>
                 </div>
-                <div className="p-1 bg-white border border-black/35 rounded-lg shadow-sm shrink-0">
+                <div className="p-1 bg-white border border-black/40 rounded-xl shadow-sm shrink-0">
                   {qrCodeDataUrl ? (
                     <img
                       src={qrCodeDataUrl}
                       alt="QR Verifikasi Pembayaran"
-                      className="w-[64px] h-[64px] object-contain block"
+                      className="w-[76px] h-[76px] object-contain block"
                     />
                   ) : (
-                    <div className="w-[64px] h-[64px] bg-stone-100 flex items-center justify-center text-[9px] font-mono text-black/40">
+                    <div className="w-[76px] h-[76px] bg-stone-100 flex items-center justify-center text-[10px] font-mono text-black/40">
                       QR CODE
                     </div>
                   )}
