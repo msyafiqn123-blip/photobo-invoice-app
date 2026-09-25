@@ -62,7 +62,7 @@ Terlampir dokumen resmi bukti pelunasan sah dari Photobo Studio. Senang sekali b
     default:
       return `Halo Kak *${clientName}*! ✨
 
-Terima kasih banyak! Pembayaran *Down Payment (DP)* untuk acara Photobooth tanggal *${eventDate}* telah kami terima:
+Terima kasih banyak! Pembayaran *Down Payment (DP)* untuk acara bersama Photobo Studio tanggal *${eventDate}* telah kami terima:
 📄 *No. Invoice:* ${invoiceCode}
 📦 *Paket:* ${packageName}
 💵 *DP Diterima:* ${dpPaid}
