@@ -64,21 +64,21 @@ const InvoiceVerificationView = ({ data }) => {
   const waUrl = getWhatsAppLink('0811-1332-931', waMsg);
 
   return (
-    <div className="min-h-screen bg-[#0F0D0E] text-stone-200 flex flex-col font-mulish py-8 px-4 sm:px-6">
-      <div className="max-w-xl mx-auto w-full space-y-6">
+    <div className="min-h-screen bg-[#0F0D0E] text-stone-200 flex flex-col font-mulish py-5 sm:py-8 px-3.5 sm:px-6">
+      <div className="max-w-xl mx-auto w-full space-y-4 sm:space-y-6">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-stone-900 border border-stone-800 p-2 shadow-xl">
+        <div className="text-center space-y-1.5 sm:space-y-2">
+          <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-stone-900 border border-stone-800 p-2 shadow-xl">
             <img
               src="/photobo_logo_white.png"
               alt="Photobo Studio"
               className="w-full h-full object-contain"
             />
           </div>
-          <h1 className="text-lg sm:text-xl font-black tracking-wider text-stone-100 uppercase">
+          <h1 className="text-base sm:text-xl font-black tracking-wider text-stone-100 uppercase">
             PHOTOBO STUDIO
           </h1>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Verifikasi Pembayaran Resmi</span>
           </div>
@@ -86,7 +86,7 @@ const InvoiceVerificationView = ({ data }) => {
 
         {/* Status Hero Card */}
         <div
-          className={`rounded-3xl p-6 sm:p-7 border shadow-2xl text-center space-y-4 ${
+          className={`rounded-2xl sm:rounded-3xl p-4 sm:p-7 border shadow-xl text-center space-y-3 sm:space-y-4 ${
             isLunas
               ? 'bg-gradient-to-b from-emerald-950/60 to-stone-950 border-emerald-500/40 text-emerald-300'
               : isDpOnly
@@ -164,7 +164,7 @@ const InvoiceVerificationView = ({ data }) => {
         </div>
 
         {/* Detailed Information Card */}
-        <div className="bg-stone-900/90 border border-stone-800 rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl">
+        <div className="bg-stone-900/90 border border-stone-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-xl">
           <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider pb-2 border-b border-stone-800">
             <Sparkles className="w-4 h-4" />
             <span>Rincian Dokumen & Layanan Resmi</span>
@@ -308,20 +308,20 @@ const InvoiceVerificationView = ({ data }) => {
         </div>
 
         {/* Action Button: Only WhatsApp Confirmation for Customer */}
-        <div className="space-y-3 pt-2">
+        <div className="pt-1 flex justify-center">
           <a
             href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-2 p-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl shadow-lg transition transform active:scale-98"
+            className="w-full max-w-xs flex items-center justify-center gap-2 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition transform active:scale-98"
           >
-            <MessageCircle className="w-5 h-5" />
-            <span>Konfirmasi ke WhatsApp Photobo Studio</span>
+            <MessageCircle className="w-4 h-4 shrink-0" />
+            <span className="whitespace-nowrap">Konfirmasi ke WhatsApp</span>
           </a>
         </div>
 
         {/* Footer Note */}
-        <div className="text-center text-[11px] text-stone-500 pt-2">
+        <div className="text-center text-[10px] text-stone-500 pt-1 pb-2">
           <p>© {new Date().getFullYear()} Photobo Studio. Hak Cipta Dilindungi.</p>
           <p className="mt-0.5">Dokumen ini merupakan verifikasi digital resmi yang terenkripsi.</p>
         </div>
