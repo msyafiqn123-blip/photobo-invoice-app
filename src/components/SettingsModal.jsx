@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Settings,
   Save,
-  Database,
   Building2,
   Check,
   X,
@@ -12,14 +11,11 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react';
-import { getSupabaseConfig, resetSupabaseClient } from '../services/supabase';
 import { PACKAGE_OPTIONS } from '../utils/invoiceCode';
 import FormattedNumberInput from './FormattedNumberInput';
 
 const SettingsModal = ({ isOpen, onClose, settings, onSaveSettings }) => {
   const [formData, setFormData] = useState(settings || {});
-  const [supabaseUrl, setSupabaseUrl] = useState(() => getSupabaseConfig().url);
-  const [supabaseKey, setSupabaseKey] = useState(() => getSupabaseConfig().key);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
@@ -99,16 +95,6 @@ const SettingsModal = ({ isOpen, onClose, settings, onSaveSettings }) => {
   const handleSave = (e) => {
     e.preventDefault();
     onSaveSettings(formData);
-
-    // Save Supabase credentials to localStorage
-    if (supabaseUrl) localStorage.setItem('photobo_supabase_url', supabaseUrl);
-    else localStorage.removeItem('photobo_supabase_url');
-
-    if (supabaseKey) localStorage.setItem('photobo_supabase_key', supabaseKey);
-    else localStorage.removeItem('photobo_supabase_key');
-
-    resetSupabaseClient();
-
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
@@ -123,7 +109,7 @@ const SettingsModal = ({ isOpen, onClose, settings, onSaveSettings }) => {
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-800 bg-stone-950/60 sticky top-0 z-10">
           <div className="flex items-center gap-2 text-stone-200 font-bold">
             <Settings className="w-5 h-5 text-amber-500" />
-            <span>Pengaturan Studio & Integrasi Supabase</span>
+            <span>Pengaturan Studio</span>
           </div>
           <button
             onClick={onClose}
@@ -405,45 +391,6 @@ const SettingsModal = ({ isOpen, onClose, settings, onSaveSettings }) => {
                   </button>
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* Supabase Cloud Connection */}
-          <div className="space-y-4 pt-2">
-            <div className="flex items-center gap-2 text-sm font-bold text-emerald-400 border-b border-stone-800 pb-2">
-              <Database className="w-4 h-4" />
-              <span>Konfigurasi Supabase Cloud Database (Opsional)</span>
-            </div>
-            <p className="text-xs text-stone-400 leading-relaxed">
-              Jika dikosongkan, aplikasi otomatis menggunakan <strong>LocalStorage browser</strong> yang langsung aktif. Jika diisi URL dan Anon Key Supabase Anda, data invoice akan tersinkronisasi ke cloud table <code className="bg-stone-800 px-1 py-0.5 rounded text-emerald-300">invoices</code>.
-            </p>
-
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs text-stone-400 font-semibold block mb-1">
-                  Supabase Project URL
-                </label>
-                <input
-                  type="text"
-                  value={supabaseUrl}
-                  onChange={(e) => setSupabaseUrl(e.target.value)}
-                  className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs font-mono text-stone-200 focus:outline-none focus:border-emerald-500"
-                  placeholder="https://xyzcompany.supabase.co"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs text-stone-400 font-semibold block mb-1">
-                  Supabase Anon Public Key
-                </label>
-                <input
-                  type="password"
-                  value={supabaseKey}
-                  onChange={(e) => setSupabaseKey(e.target.value)}
-                  className="w-full bg-stone-950 border border-stone-800 rounded-xl px-3 py-2 text-xs font-mono text-stone-200 focus:outline-none focus:border-emerald-500"
-                  placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                />
-              </div>
             </div>
           </div>
 
