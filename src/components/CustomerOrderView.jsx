@@ -13,7 +13,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { formatRupiah, formatDateIndo } from '../utils/formatters';
-import { buildOrderWhatsAppMessage, encodeOrderData } from '../utils/order';
+import { buildOrderWhatsAppMessage, encodeOrderData, getPromoDetails } from '../utils/order';
 import { loadSettings } from '../services/storage';
 
 const CustomerOrderView = () => {
@@ -21,6 +21,7 @@ const CustomerOrderView = () => {
   const packages = settings?.packages || [];
   const studioWhatsapp = settings?.whatsapp || '0811-1332-931';
   const cleanStudioPhone = studioWhatsapp.replace(/\D/g, '');
+  const promo = getPromoDetails();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -157,9 +158,19 @@ const CustomerOrderView = () => {
                 <span className="text-stone-400">Paket Terpilih</span>
                 <span className="font-bold text-stone-100">[{selectedPkg.code}] {selectedPkg.name}</span>
               </div>
+              <div className="flex justify-between py-1 border-b border-stone-800/60">
+                <span className="text-stone-400">Harga Paket Normal</span>
+                <span className="font-mono text-stone-500 line-through">{formatRupiah(selectedPkg.defaultPrice)}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-stone-800/60 text-rose-400">
+                <span>Diskon Promo (s.d. {promo.deadlineText})</span>
+                <span className="font-mono font-bold">-Rp 200.000</span>
+              </div>
               <div className="flex justify-between py-1">
-                <span className="text-stone-400">Total Harga Paket</span>
-                <span className="font-mono font-bold text-emerald-400">{formatRupiah(selectedPkg.defaultPrice)}</span>
+                <span className="text-stone-300 font-bold">Total Harga Paket</span>
+                <span className="font-mono font-black text-emerald-400 text-sm">
+                  {formatRupiah(Math.max(0, (Number(selectedPkg.defaultPrice) || 0) - promo.discountAmount))}
+                </span>
               </div>
             </div>
 
@@ -332,16 +343,25 @@ const CustomerOrderView = () => {
               </div>
             </div>
 
-            {/* 3. Pilihan Paket Photobooth */}
+            {/* 3. Pilihan Paket Layanan */}
             <div className="bg-stone-900/90 border border-stone-800 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xl">
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider pb-1 border-b border-stone-800">
-                <Sparkles className="w-4 h-4" />
-                <span>3. Pilihan Paket Layanan</span>
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-stone-800">
+                <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4" />
+                  <span>3. Pilihan Paket Layanan</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-950/70 text-rose-300 border border-rose-500/40 shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                  <span>Diskon Rp 200.000 ({promo.promoLabel})</span>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {packages.map((pkg) => {
                   const isSelected = formData.packageCode === pkg.code;
+                  const originalPrice = Number(pkg.defaultPrice) || 0;
+                  const finalPrice = Math.max(0, originalPrice - promo.discountAmount);
+
                   return (
                     <div
                       key={pkg.code}
@@ -354,9 +374,14 @@ const CustomerOrderView = () => {
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <span className="font-bold text-xs sm:text-sm text-stone-100 block">
-                            [{pkg.code}] {pkg.name}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-xs sm:text-sm text-stone-100 block">
+                              [{pkg.code}] {pkg.name}
+                            </span>
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                              -200rb
+                            </span>
+                          </div>
                           <span className="text-[11px] text-amber-300 font-semibold block mt-0.5">
                             {pkg.printType} • {pkg.durationHours} Jam Acara
                           </span>
@@ -372,11 +397,23 @@ const CustomerOrderView = () => {
                         </div>
                       </div>
 
-                      <div className="mt-2.5 pt-2 border-t border-stone-800/80 flex items-center justify-between">
-                        <span className="text-[10px] text-stone-500 uppercase">Tarif Paket</span>
-                        <span className="font-mono font-black text-xs text-emerald-400">
-                          {formatRupiah(pkg.defaultPrice)}
-                        </span>
+                      <div className="mt-2.5 pt-2 border-t border-stone-800/80 flex items-end justify-between gap-2">
+                        <div>
+                          <span className="text-[10px] text-stone-500 uppercase block font-semibold">
+                            Tarif Paket
+                          </span>
+                          <span className="text-[9.5px] text-rose-400/90 font-medium block">
+                            s.d. {promo.deadlineText}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-mono text-[11px] text-stone-500 line-through block">
+                            {formatRupiah(originalPrice)}
+                          </span>
+                          <span className="font-mono font-black text-xs sm:text-sm text-emerald-400 block">
+                            {formatRupiah(finalPrice)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   );

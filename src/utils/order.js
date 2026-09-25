@@ -1,5 +1,36 @@
 import { generateInvoiceCode, PACKAGE_OPTIONS } from './invoiceCode';
-import { formatDateIndo, formatRupiah } from './formatters';
+import { formatDateIndo, formatRupiah, MONTH_NAMES_ID } from './formatters';
+
+/**
+ * Calculates promo discount details:
+ * Rp 200.000 discount with deadline automatically set to end of H+1 month.
+ * e.g. In September 2026 -> deadline is 31 Oktober 2026.
+ * In October 2026 -> deadline is 30 November 2026, and so on.
+ */
+export const getPromoDetails = (refDate = new Date()) => {
+  const current = new Date(refDate);
+  const year = current.getFullYear();
+  const month = current.getMonth(); // 0 to 11
+
+  // End of next month is day 0 of month + 2
+  const deadlineDate = new Date(year, month + 2, 0);
+  const day = deadlineDate.getDate();
+  const monthName = MONTH_NAMES_ID[deadlineDate.getMonth()];
+  const deadlineYear = deadlineDate.getFullYear();
+
+  const deadlineText = `${day} ${monthName} ${deadlineYear}`;
+  const discountAmount = 200000;
+
+  return {
+    discountAmount,
+    deadlineDate,
+    deadlineDay: day,
+    deadlineMonthName: monthName,
+    deadlineYear,
+    deadlineText,
+    promoLabel: `s.d. ${deadlineText}`,
+  };
+};
 
 export const encodeOrderData = (order) => {
   const fields = [
@@ -53,8 +84,11 @@ export const createInvoiceFromOrderData = (orderData, currentPackages = PACKAGE_
       defaultPrice: 2500000,
     };
 
+  const promo = getPromoDetails();
   const pkgPrice = Number(selectedPkg.defaultPrice) || 2500000;
-  const dpAmount = Math.round(pkgPrice * 0.2); // 20% standard DP
+  const discountAmount = promo.discountAmount || 200000;
+  const grandTotal = Math.max(0, pkgPrice - discountAmount);
+  const dpAmount = Math.round(grandTotal * 0.2); // 20% standard DP of net grand total
   const eventDate = orderData.date || today;
   const timeStart = orderData.timeStart || '10.00';
   const timeEnd = orderData.timeEnd || '14.00';
@@ -99,15 +133,22 @@ export const createInvoiceFromOrderData = (orderData, currentPackages = PACKAGE_
         paymentType: 'DOWN PAYMENT',
         amountPaid: dpAmount,
       },
+      {
+        id: 'item-2',
+        description: `Promo Diskon Booking\ns.d. ${promo.deadlineText}`,
+        price: discountAmount,
+        paymentType: 'DISCOUNT',
+        amountPaid: -discountAmount,
+      },
     ],
     summary: {
       totalPackagePrice: pkgPrice,
       totalAdditionals: 0,
-      totalDiscounts: 0,
-      grandTotal: pkgPrice,
+      totalDiscounts: discountAmount,
+      grandTotal: grandTotal,
       downPaymentPaid: dpAmount,
       totalPaidSoFar: 0,
-      remainingBalance: pkgPrice,
+      remainingBalance: grandTotal,
     },
     paymentMethod: `${settings.bankName || 'BCA'} TRANSFER`,
     accountNumber: `${settings.bankName || 'BCA'} ${settings.bankAccountNumber || '7045166686'}`,
@@ -119,6 +160,9 @@ export const createInvoiceFromOrderData = (orderData, currentPackages = PACKAGE_
 
 export const buildOrderWhatsAppMessage = (order, pkg, studioWhatsapp = '0811-1332-931') => {
   const adminOrderUrl = `https://photobo.pics/?orderData=${encodeOrderData(order)}`;
+  const originalPrice = Number(pkg?.defaultPrice) || 2500000;
+  const promo = getPromoDetails();
+  const finalPrice = Math.max(0, originalPrice - promo.discountAmount);
 
   return `*FORM ORDER PHOTOBO STUDIO*
 ----------------------------------------
@@ -128,7 +172,9 @@ export const buildOrderWhatsAppMessage = (order, pkg, studioWhatsapp = '0811-133
 📅 *Tanggal Acara:* ${order.date ? formatDateIndo(order.date) : '-'}
 ⏰ *Jam Acara:* ${order.timeStart || '10.00'} - ${order.timeEnd || '14.00'}
 📸 *Paket Layanan:* [${pkg?.code || '03'}] ${pkg?.name || 'Photobooth'} (${pkg?.printType || 'Unlimited 2R'})
-💰 *Harga Paket:* ${formatRupiah(pkg?.defaultPrice || 2500000)}
+💰 *Harga Normal:* ~${formatRupiah(originalPrice)}~
+🏷️ *Diskon Promo:* -${formatRupiah(promo.discountAmount, true)} (s.d. ${promo.deadlineText})
+✨ *Total Tarif Paket:* ${formatRupiah(finalPrice)}
 ${order.notes ? `📝 *Catatan Tambahan:* ${order.notes}\n` : ''}----------------------------------------
 Halo Photobo Studio, saya telah mengisi formulir pemesanan di atas. Mohon konfirmasi ketersediaan jadwal dan penerbitan invoice resmi. Terima kasih!
 
