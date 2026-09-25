@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Eye, EyeOff, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 
 const ADMIN_PASSWORD = 'sasiera';
 
@@ -41,13 +41,6 @@ const AuthGateView = ({ onLoginSuccess }) => {
             <h1 className="text-xl sm:text-2xl font-black tracking-wider text-stone-100 uppercase">
               PHOTOBO STUDIO
             </h1>
-            <p className="text-xs text-stone-400 mt-1">
-              Akses Sistem Generator Invoice & Booking
-            </p>
-          </div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/25">
-            <Lock className="w-3.5 h-3.5 text-amber-400" />
-            <span>Sistem Dilindungi Password</span>
           </div>
         </div>
 
@@ -97,11 +90,6 @@ const AuthGateView = ({ onLoginSuccess }) => {
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
-
-        {/* Security Note */}
-        <div className="text-center text-[11px] text-stone-500 pt-2 border-t border-stone-800/80">
-          <p>Halaman publik untuk pemindaian QR Code tetap dapat diakses oleh pelanggan tanpa password.</p>
-        </div>
       </div>
     </div>
   );
