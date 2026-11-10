@@ -18,6 +18,7 @@ import {
 import { generateInvoiceCode, PACKAGE_OPTIONS } from './utils/invoiceCode';
 import { downloadInvoicePdf, printInvoice } from './utils/exportPdf';
 import CustomerOrderView from './components/CustomerOrderView';
+import DownloadView from './components/DownloadView';
 import { parseOrderData, createInvoiceFromOrderData } from './utils/order';
 import {
   FileText,
@@ -138,6 +139,14 @@ function App() {
     new URLSearchParams(window.location.search).get('order') === '1'
   );
 
+  // Check if current URL is a dedicated mobile download page (/download or ?download=1 or ?dl=1)
+  const isDownloadRoute = typeof window !== 'undefined' && (
+    window.location.pathname === '/download' ||
+    window.location.pathname.startsWith('/download') ||
+    new URLSearchParams(window.location.search).get('download') === '1' ||
+    new URLSearchParams(window.location.search).get('dl') === '1'
+  );
+
   // Check incoming order data (?orderData=...) for automatic invoice creation
   const [pendingOrderData, setPendingOrderData] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -248,6 +257,19 @@ function App() {
     }
   }, [isAuthenticated, pendingOrderData, invoices, settings]);
 
+  // Auto-save active invoice to storage whenever it changes (debounced 600ms)
+  useEffect(() => {
+    if (!activeInvoice || !activeInvoice.id) return;
+    const timer = setTimeout(() => {
+      saveInvoice(activeInvoice).then((updatedList) => {
+        if (Array.isArray(updatedList) && updatedList.length > 0) {
+          setInvoices(updatedList);
+        }
+      }).catch(() => {});
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [activeInvoice]);
+
   const showToast = (message) => {
     setNotification(message);
     setTimeout(() => setNotification(null), 3000);
@@ -303,6 +325,9 @@ function App() {
       setActiveInvoice(invToDownload);
     }
 
+    // Auto-save target before downloading so changes are always preserved
+    await saveInvoice(target);
+
     showToast('Menyiapkan file PDF...');
     try {
       // Small delay to ensure activeInvoice state updates if target was changed
@@ -345,6 +370,11 @@ function App() {
   // Customer Order Page (Public)
   if (isOrderRoute) {
     return <CustomerOrderView />;
+  }
+
+  // Dedicated Mobile PDF Download Page (Public)
+  if (isDownloadRoute) {
+    return <DownloadView />;
   }
 
   if (verificationData) {

@@ -243,8 +243,21 @@ export const INITIAL_SAMPLE_INVOICES = [
   },
 ];
 
-const STORAGE_KEY = 'photobo_invoices_v4';
-const SETTINGS_KEY = 'photobo_settings_v4';
+const ALL_STORAGE_KEYS = [
+  'photobo_invoices_v4',
+  'photobo_invoices_v3',
+  'photobo_invoices_v2',
+  'photobo_invoices_v1',
+  'photobo_invoices',
+];
+
+const ALL_SETTINGS_KEYS = [
+  'photobo_settings_v4',
+  'photobo_settings_v3',
+  'photobo_settings_v2',
+  'photobo_settings_v1',
+  'photobo_settings',
+];
 
 export const loadInvoices = async () => {
   const supabase = getSupabase();
@@ -262,21 +275,52 @@ export const loadInvoices = async () => {
     }
   }
 
-  const local = localStorage.getItem(STORAGE_KEY);
-  if (!local) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_SAMPLE_INVOICES));
-    return INITIAL_SAMPLE_INVOICES;
-  }
-  try {
-    return JSON.parse(local);
-  } catch (e) {
-    return INITIAL_SAMPLE_INVOICES;
-  }
+  // Scan and gather invoices from all previous storage versions to guarantee 0 data loss
+  const invoiceMap = new Map();
+
+  // 1. First add initial sample invoices as baseline
+  INITIAL_SAMPLE_INVOICES.forEach((inv) => {
+    const key = inv.invoiceCode || inv.id;
+    if (key) invoiceMap.set(key, inv);
+  });
+
+  // 2. Then load from all localStorage keys (newer keys override older ones)
+  // We read from oldest to newest so newest edits take precedence
+  const reversedKeys = [...ALL_STORAGE_KEYS].reverse();
+  reversedKeys.forEach((storageKey) => {
+    try {
+      const local = localStorage.getItem(storageKey);
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((inv) => {
+            const key = inv.invoiceCode || inv.id;
+            if (key) {
+              invoiceMap.set(key, inv);
+            }
+          });
+        }
+      }
+    } catch (_) {}
+  });
+
+  const mergedInvoices = Array.from(invoiceMap.values());
+
+  // Re-save merged result to all keys to keep storage synchronized
+  ALL_STORAGE_KEYS.forEach((k) => {
+    try {
+      localStorage.setItem(k, JSON.stringify(mergedInvoices));
+    } catch (_) {}
+  });
+
+  return mergedInvoices;
 };
 
 export const saveInvoice = async (invoice) => {
   const current = await loadInvoices();
-  const existsIndex = current.findIndex((item) => item.id === invoice.id);
+  const existsIndex = current.findIndex(
+    (item) => item.id === invoice.id || item.invoiceCode === invoice.invoiceCode
+  );
   let updated;
   if (existsIndex >= 0) {
     updated = [...current];
@@ -285,7 +329,11 @@ export const saveInvoice = async (invoice) => {
     updated = [{ ...invoice, createdAt: new Date().toISOString() }, ...current];
   }
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  ALL_STORAGE_KEYS.forEach((k) => {
+    try {
+      localStorage.setItem(k, JSON.stringify(updated));
+    } catch (_) {}
+  });
 
   const supabase = getSupabase();
   if (supabase) {
@@ -301,8 +349,13 @@ export const saveInvoice = async (invoice) => {
 
 export const deleteInvoice = async (id) => {
   const current = await loadInvoices();
-  const updated = current.filter((item) => item.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  const updated = current.filter((item) => item.id !== id && item.invoiceCode !== id);
+
+  ALL_STORAGE_KEYS.forEach((k) => {
+    try {
+      localStorage.setItem(k, JSON.stringify(updated));
+    } catch (_) {}
+  });
 
   const supabase = getSupabase();
   if (supabase) {
@@ -317,25 +370,43 @@ export const deleteInvoice = async (id) => {
 };
 
 export const loadSettings = () => {
-  const local = localStorage.getItem(SETTINGS_KEY);
-  if (!local) {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_STUDIO_SETTINGS));
-    return DEFAULT_STUDIO_SETTINGS;
+  let foundSettings = null;
+  for (const k of ALL_SETTINGS_KEYS) {
+    try {
+      const local = localStorage.getItem(k);
+      if (local) {
+        const parsed = JSON.parse(local);
+        if (parsed && typeof parsed === 'object') {
+          foundSettings = parsed;
+          break;
+        }
+      }
+    } catch (_) {}
   }
-  try {
-    const parsed = JSON.parse(local);
-    return {
-      ...DEFAULT_STUDIO_SETTINGS,
-      ...parsed,
-      packages: Array.isArray(parsed?.packages) && parsed.packages.length > 0 ? parsed.packages : DEFAULT_STUDIO_SETTINGS.packages,
-    };
-  } catch (e) {
-    return DEFAULT_STUDIO_SETTINGS;
-  }
+
+  const merged = {
+    ...DEFAULT_STUDIO_SETTINGS,
+    ...(foundSettings || {}),
+    packages: Array.isArray(foundSettings?.packages) && foundSettings.packages.length > 0
+      ? foundSettings.packages
+      : DEFAULT_STUDIO_SETTINGS.packages,
+  };
+
+  ALL_SETTINGS_KEYS.forEach((k) => {
+    try {
+      localStorage.setItem(k, JSON.stringify(merged));
+    } catch (_) {}
+  });
+
+  return merged;
 };
 
 export const saveSettings = (newSettings) => {
   const merged = { ...DEFAULT_STUDIO_SETTINGS, ...newSettings };
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(merged));
+  ALL_SETTINGS_KEYS.forEach((k) => {
+    try {
+      localStorage.setItem(k, JSON.stringify(merged));
+    } catch (_) {}
+  });
   return merged;
 };
