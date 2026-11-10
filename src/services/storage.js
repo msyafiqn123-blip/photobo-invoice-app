@@ -20,6 +20,58 @@ export const DEFAULT_STUDIO_SETTINGS = {
 
 export const INITIAL_SAMPLE_INVOICES = [
   {
+    id: 'inv-nova-yogi-01',
+    invoiceCode: 'INV 01.09/X/01/26',
+    invoiceDate: '2026-11-07',
+    docType: 'TAGIHAN_DP',
+    stageCode: '01',
+    sequenceNumber: '09',
+    packageCode: 'X',
+    client: {
+      name: 'NOVA/YOGI',
+      phone: '087736883306',
+      location: 'Bale dan Resto Panghegar Purwakarta',
+    },
+    event: {
+      date: '2026-12-19',
+      timeStart: '12.15',
+      timeEnd: '14.15',
+      durationHours: 2,
+      printType: 'Unlimited 2R',
+      packageName: 'Photobooth 2 Jam 2R',
+    },
+    items: [
+      {
+        id: 'item-1',
+        description: 'Photobooth 2 Jam 2R\nUnlimited 2R\n19 Desember 2026\n12.15 - 14.15',
+        price: 1600000,
+        paymentType: 'DOWN PAYMENT',
+        amountPaid: 260000,
+      },
+      {
+        id: 'item-2',
+        description: 'Promo Diskon Booking\ns.d. 31 Desember 2026',
+        price: 300000,
+        paymentType: 'DISCOUNT',
+        amountPaid: -300000,
+      },
+    ],
+    summary: {
+      totalPackagePrice: 1600000,
+      totalAdditionals: 0,
+      totalDiscounts: 300000,
+      grandTotal: 1300000,
+      downPaymentPaid: 260000,
+      totalPaidSoFar: 260000,
+      remainingBalance: 1040000,
+    },
+    paymentMethod: 'BCA TRANSFER',
+    accountNumber: 'BCA 7045166686',
+    accountHolder: 'Sasiera Diva P',
+    hasStamp: false,
+    notes: '',
+  },
+  {
     id: 'inv-vira-01',
     invoiceCode: 'INV 01.08/I/03/26',
     invoiceDate: '2026-01-11',
@@ -191,8 +243,8 @@ export const INITIAL_SAMPLE_INVOICES = [
   },
 ];
 
-const STORAGE_KEY = 'photobo_invoices_v3';
-const SETTINGS_KEY = 'photobo_settings_v3';
+const STORAGE_KEY = 'photobo_invoices_v4';
+const SETTINGS_KEY = 'photobo_settings_v4';
 
 export const loadInvoices = async () => {
   const supabase = getSupabase();
