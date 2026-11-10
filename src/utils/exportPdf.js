@@ -98,6 +98,14 @@ export const getInvoicePdfBlob = async (elementId = 'invoice-document', paperSiz
           clonedEl.style.display = 'block';
           clonedEl.style.visibility = 'visible';
           clonedEl.style.opacity = '1';
+
+          // Prevent html2canvas from clipping letter descenders/ascenders
+          const allInner = clonedEl.querySelectorAll('div, p, span, h1, h2, h3');
+          allInner.forEach((el) => {
+            if (el.style) {
+              el.style.overflow = 'visible';
+            }
+          });
         }
       },
     });

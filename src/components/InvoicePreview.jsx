@@ -204,39 +204,40 @@ const InvoicePreview = forwardRef(({ invoice, settings, scale = 1, id = 'invoice
             </h1>
           </div>
 
-          {/* Metadata 2 Columns Section with explicit fixed height for 100% bulletproof PDF export */}
+          {/* Metadata 2 Columns Section with ample height and overflow visible for 100% unclipped PDF export */}
           <div
             className="flex justify-between items-start mt-4 mb-6"
             style={{
-              height: '110px',
+              minHeight: '105px',
               boxSizing: 'border-box',
+              overflow: 'visible',
             }}
           >
             {/* Left Column: Nota Title, Code, Date */}
             <div className="w-[50%]">
-              <div className="font-black text-[16px] tracking-wide uppercase text-black leading-tight">
+              <div className="font-black text-[16px] tracking-wide uppercase text-black leading-snug">
                 {docConfig.title}
               </div>
-              <div className="text-black font-bold text-[14.5px] tracking-wide mt-1 leading-tight">
+              <div className="text-black font-bold text-[14.5px] tracking-wide mt-1 leading-snug">
                 {invoiceCode}
               </div>
-              <div className="text-black font-semibold text-[14px] mt-1 leading-tight">
+              <div className="text-black font-semibold text-[14px] mt-1 leading-snug">
                 {formatDateIndo(invoiceDate)}
               </div>
             </div>
 
-            {/* Right Column: Client Information (Right Aligned, compact and clean) */}
-            <div className="w-[50%] text-right space-y-0.5">
-              <div className="font-bold tracking-wider uppercase text-black text-[12.5px] leading-tight">
+            {/* Right Column: Client Information (Right Aligned, unclipped and clean) */}
+            <div className="w-[50%] text-right space-y-1" style={{ overflow: 'visible' }}>
+              <div className="font-bold tracking-wider uppercase text-black text-[12.5px] leading-snug">
                 {docConfig.recipientLabel}
               </div>
-              <div className="font-black text-[17px] tracking-wide text-black uppercase truncate leading-tight">
+              <div className="font-black text-[17px] tracking-wide text-black uppercase leading-snug" style={{ overflow: 'visible' }}>
                 {client.name || 'NAMA KLIEN'}
               </div>
-              <div className="text-black font-semibold text-[13.5px] leading-tight">
+              <div className="text-black font-semibold text-[13.5px] leading-snug" style={{ overflow: 'visible' }}>
                 {client.phone || '08XX-XXXX-XXXX'}
               </div>
-              <div className="text-black font-medium text-[13.5px] truncate leading-tight">
+              <div className="text-black font-medium text-[13.5px] leading-snug" style={{ overflow: 'visible' }}>
                 {client.location || 'Kota, Provinsi'}
               </div>
             </div>
